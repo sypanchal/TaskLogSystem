@@ -1,0 +1,149 @@
+﻿@model TaskLogSystem.Models.Employee
+
+@using TaskLogSystem.Models
+
+@{
+    TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+}
+
+@using (Html.BeginForm(Model.EmployeeID == 0 ? "CreateEmployee" : "UpdateEmployee", "Employees", FormMethod.Post, new
+{
+    id = "EmployeeForm"
+}))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        @if (Model.EmployeeID != 0)
+        {
+            <div class="col-6 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="EmployeeID">Employee ID</label>
+                    <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" readonly>
+                </div>
+            </div>
+
+            <div class="col-6 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="EmployeeCode">Employee Code</label>
+                    <input type="text" class="form-control mw-100" id="EmployeeCode" name="EmployeeCode" value="@Model.EmployeeCode" readonly>
+                </div>
+            </div>
+        }
+
+        <div class="col-6 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="FirstName">First Name</label>
+                <input type="text" class="form-control mw-100" id="FirstName" name="FirstName" value="@Model.FirstName" placeholder="First Name" required>
+                @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-6 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="LastName">Last Name</label>
+                <input type="text" class="form-control mw-100" id="LastName" name="LastName" value="@Model.LastName" placeholder="Last Name" required>
+                @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-3 mb-3">
+            <div class="form-group">
+                <label class="form-label text-bold mb-3">Gender</label><br />
+
+                @Html.RadioButton("Gender", "M", Model.Gender == "M", new { @class = "form-check-input", id = "maleGender" })
+                <label class="form-check-label" for="maleGender">Male</label>
+
+                @Html.RadioButton("Gender", "F", Model.Gender == "F", new { @class = "form-check-input", id = "femaleGender" })
+                <label class="form-check-label" for="femaleGender">Female</label>
+            </div>
+        </div>
+
+        <div class="col-3 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="DateOfBirth">Date of Birth</label>
+                <input type="date" name="DateOfBirth" id="DateOfBirth" class="form-control mw-100" value="@(Model.EmployeeID != 0 ? Model.DateOfBirth.ToString("yyyy-MM-dd") : "")" max="@DateTime.Now.AddYears(-18).ToString("yyyy-MM-dd")" required />
+            </div>
+        </div>
+
+        <div class="col-3 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="DepartmentID">Department</label>
+                <select class="form-select" id="DepartmentID" name="DepartmentID">
+                    @{
+                        var departments = new SelectList(_dbContext.Departments, "DepartmentID", "DepartmentName");
+                        foreach (var d in departments)
+                        {
+                            <option value="@d.Value" @(Convert.ToInt32(d.Value) == Model.DepartmentID ? "selected" : "") @(Model.DepartmentID == 0 && Convert.ToInt32(d.Value) == 3 ? "selected" : "" )>@d.Text</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+
+        <div class="col-3 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="ReportingPerson">Reporting Person</label>
+                <select class="form-select" id="ReportingPerson" name="ReportingPerson">
+                    @{
+
+                        var reportingPersons = Model.EmployeeID == 0 ? new SelectList(_dbContext.Employees.Where(e => e.DepartmentID < 3), "EmployeeID", "FirstName") : new SelectList(_dbContext.Employees.Where(e => e.DepartmentID < Model.DepartmentID || e.EmployeeID == Model.ReportingPerson), "EmployeeID", "FirstName");
+                        foreach (var d in reportingPersons)
+                        {
+                            <option value="@d.Value" @(Convert.ToInt32(d.Value) == Model.ReportingPerson ? "selected" : "")>@d.Text</option>
+                        }
+                    }
+                </select>
+                @Html.ValidationMessageFor(model => model.ReportingPerson, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-6 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="Email">Email</label>
+                @Html.TextBox("Email", Model.Email, new { @class = "form-control mw-100", id = "Email", placeholder = "example@abc.com", required = "required" })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-6 mb-3">
+            <div class="form-group">
+                <label class="form-label text-bold" for="MobileNumber">Mobile Number</label>
+                @Html.TextBox("MobileNumber", Model.MobileNumber, new { @class = "form-control mw-100", placeholder = "Enter Valid Phone Number (Ex: 8495673201)", minlength = "10", maxlength = "10", size = "10", id = "MobileNumber", required = "required" })
+                @Html.ValidationMessageFor(model => model.MobileNumber, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @if (Model.EmployeeID == 0)
+        {
+            <div class="col-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="password">Password</label>
+                    @Html.Password("password", null, new { @class = "form-control mw-100", id = "password", placeholder = "••••••••", minlength = "8", required = "required" })
+                </div>
+            </div>
+
+            <div class="col-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="confirmPassword">Confirm Password</label>
+                    @Html.Password("confirmPassword", null, new { @class = "form-control mw-100", id = "confirmPassword", placeholder = "••••••••", minlength = "8", required = "required" })
+                    @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="col-6 offset-3 mb-2">
+        <div class="form-group">
+            @if (Model.EmployeeID == 0)
+            {
+                <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat form-control">Create Employee</button>
+            }
+            else
+            {
+                <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat form-control">Update Employee</button>
+
+            }
+        </div>
+    </div>
+}

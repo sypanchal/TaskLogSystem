@@ -1,0 +1,89 @@
+﻿@model List<TaskLogSystem.Models.Employee>
+
+@using TaskLogSystem.Models
+@{
+    Employee user = null;
+    if (Session["CurrentUser"] != null)
+    {
+        user = (Employee)Session["CurrentUser"];
+    }
+}
+
+<table class="table table-bordered table-responsive" id="EmployeeTable">
+    <thead>
+        <tr>
+            <th>
+                Employee Code
+            </th>
+            <th>
+                Employee Name
+            <th>
+                Gender
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Department
+            </th>
+
+            @if (user.DepartmentID == 1)
+            {
+                <th>
+                    Reporting Person
+                </th>
+
+                <th>
+                    Action
+                </th>
+            }
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EmployeeCode)
+                </td>
+                <td>
+                    @((item != null) ? item.FirstName + " " + item.LastName : null)
+                </td>
+                <td>
+                    @((item.Gender == "M") ? "Male" : "Female")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Department.DepartmentName)
+                </td>
+
+                @if (user.DepartmentID == 1)
+                {
+                    <td>
+                        @((item != null && item.Employee2 != null) ? item.Employee2.FirstName + " " + item.Employee2.LastName : null)
+                    </td>
+
+                    <td>
+
+                        <button type="button"
+                                class="btn btn-primary editEmployeeBtn"
+                                data-id="@item.EmployeeID"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalId">
+                            Edit
+                        </button>
+
+                        <button type="button"
+                                class="btn btn-danger deleteEmployeeBtn"
+                                data-id="@item.EmployeeID">
+                            Delete
+                        </button>
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>

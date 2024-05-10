@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewBag.Title = "Login";
+}
+
+@model TaskLogSystem.Models.Employee
+
+<div class="login-box">
+
+    <div class="login-logo">
+        <b>Log into your account</b>
+    </div>
+
+    <div class="row align-items-center">
+        <div class="login-box-body">
+            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new
+            {
+                id = "LoginForm"
+            }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="col-12 mb-2">
+                    <div class="form-group">
+                        <label class="form-label text-bold" for="email">Email</label>
+                        @Html.TextBox("email", null, new { @class = "form-control mw-100", id = "email", placeholder = "example@abc.com", required = "required" })
+                        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-12 mb-3">
+                    <div class="form-group">
+                        <label class="form-label text-bold" for="password">Password</label>
+                        @Html.Password("password", null, new { @class = "form-control mw-100", id = "password", placeholder = "••••••••", minlength = "8", required = "required" })
+                        @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-6 offset-3 mb-2">
+                    <div class="form-group">
+                        <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat form-control">Login</button>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 mb-2">
+                    <div class="text-center">
+                        Don't have an account?
+                        <a href="@Url.Action("Signup", "Account")"> Register here </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,116 @@
+﻿@{
+    ViewBag.Title = "Profile";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model TaskLogSystem.Models.Employee
+@using TaskLogSystem.Models
+
+@{Html.RenderPartial("_Header"); }
+
+<div class="container">
+    <div class="text-center mb-4">
+        <h1><b>My Profile</b></h1>
+    </div>
+
+    @using (Html.BeginForm("Settings", "Employees", FormMethod.Post, new
+    {
+        id = "EmployeeProfileForm"
+    }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="row">
+
+            <input type="number" class="form-control" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" readonly hidden>
+
+
+            <div class="col-4 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="EmployeeCode">Employee Code</label>
+                    @Html.TextBox("EmployeeCode", Model.EmployeeCode, new { @class = "form-control mw-100", id = "EmployeeCode", required = "required", @readonly = "readonly" })
+                    @Html.ValidationMessageFor(model => model.EmployeeCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-4 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="FirstName">First Name</label>
+                    @Html.TextBox("FirstName", Model.FirstName, new { @class = "form-control mw-100", id = "FirstName", placeholder = "First Name", required = "required" })
+                    @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-4 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="LastName">Last Name</label>
+                    @Html.TextBox("LastName", Model.LastName, new { @class = "form-control mw-100", id = "LastName", placeholder = "Last Name", required = "required" })
+                    @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-2 mb-3">
+                <div class="form-group">
+                    <label class="form-label text-bold mb-3">Gender</label><br />
+
+                    @Html.RadioButton("Gender", "M", Model.Gender == "M", new { @class = "form-check-input", id = "maleGender" })
+                    <label class="form-check-label" for="maleGender">Male</label>
+
+                    @Html.RadioButton("Gender", "F", Model.Gender == "F", new { @class = "form-check-input", id = "femaleGender" })
+                    <label class="form-check-label" for="femaleGender">Female</label>
+                </div>
+            </div>
+
+            <div class="col-4 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="DateOfBirth">Date of Birth</label>
+                    <input type="date" name="DateOfBirth" id="DateOfBirth" class="form-control mw-100" max="@DateTime.Now.AddYears(-18).ToString("yyyy-MM-dd")" value="@Model.DateOfBirth.ToString("yyyy-MM-dd")" required />
+                </div>
+            </div>
+
+            <div class="col-3 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="DepartmentID">Department</label>
+
+                    @Html.TextBox("DepartmentID", Model.DepartmentID == 1 ? "Director" : Model.DepartmentID == 2 ? "Manager" : "Employee", new { @class = "form-control mw-100", id = "DepartmentID", required = "required", @readonly = "readonly" })
+                </div>
+            </div>
+
+            <div class="col-3 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="ReportingPerson">Reporting Person</label>
+                    @{
+                        TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+
+                        var employee = _dbContext.Employees.Find(Model.ReportingPerson);
+                        string ReportingPersonName = employee.FirstName + " " + employee.LastName;
+
+                    }
+                    @Html.TextBox("ReportingPerson", ReportingPersonName, new { @class = "form-control mw-100", id = "ReportingPerson", required = "required", @readonly = "readonly" })
+                </div>
+            </div>
+
+            <div class="col-6 mb-2">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="Email">Email</label>
+                    @Html.TextBox("Email", Model.Email, new { @class = "form-control mw-100", id = "Email", placeholder = "example@abc.com", required = "required" })
+                    @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-6 mb-3">
+                <div class="form-group">
+                    <label class="form-label text-bold" for="MobileNumber">Mobile Number</label>
+                    @Html.TextBox("MobileNumber", Model.MobileNumber, new { @class = "form-control mw-100", placeholder = "Enter Valid Phone Number (Ex: 8495673201)", minlength = "10", maxlength = "10", size = "10", id = "MobileNumber", required = "required" })
+                    @Html.ValidationMessageFor(model => model.MobileNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="col-2 offset-5 my-3">
+                <div class="form-group">
+                    <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat form-control">Update Profile</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -1,0 +1,347 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+}
+
+@using TaskLogSystem.Models
+
+@{
+
+    Employee user = null;
+    if (Session["CurrentUser"] != null)
+    {
+        user = (Employee)Session["CurrentUser"];
+    }
+
+    TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+}
+
+
+@{Html.RenderPartial("_Header"); }
+
+
+@if (user.DepartmentID != 1)
+{
+    <div class="container-fluid">
+        <div class="text-center">
+            <h1><b>Task Log Entry</b></h1>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary btn-lg addTaskBtn float-end mx-5"
+                data-bs-toggle="modal"
+                data-bs-target="#modalId">
+            Add Task
+        </button>
+
+        @{Html.RenderPartial("_TasksTable");}
+
+        <div class="modal fade"
+             id="modalId"
+             tabindex="-1"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             role="dialog"
+             aria-labelledby="modalTitleId"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md"
+                 role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="taskDetails">Task Details</h3>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @{Html.RenderPartial("_TaskLogForm", new TaskLogSystem.Models.Task());}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container-fluid">
+        <div class="text-center">
+            <h1><b>Employees List</b></h1>
+        </div>
+
+        <button type="button"
+                class="btn btn-primary btn-lg addEmployeeBtn float-end mx-5"
+                data-bs-toggle="modal"
+                data-bs-target="#modalId">
+            Add Employee
+        </button>
+
+        @{Html.RenderPartial("_EmployeesTable");}
+
+        <div class="modal fade"
+             id="modalId"
+             tabindex="-1"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             role="dialog"
+             aria-labelledby="modalTitleId"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg"
+                 role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="taskDetails">Task Details</h3>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @{Html.RenderPartial("_EmployeeForm", new TaskLogSystem.Models.Employee());}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section scripts {
+    <script>
+        // Initializing Data Table
+        $(document).ready(function () {
+            $("#EmployeeTable").DataTable();
+            $("#TaskTable").DataTable({
+                "columnDefs": [
+                    { "width": "170px", "targets": 1 }, // Set width for the second column
+                    { "width": "120px", "targets": 2 }  // Set width for the third column
+                ],
+                order: [[2, 'asc']]
+            });
+        });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Task Form Reset
+        $(document).on("click", ".addTaskBtn", function () {
+            var url = "/Task/Create";
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching actor details.");
+                }
+            });
+        });
+
+        // Edit Task
+        $(document).on("click", ".editTaskBtn", function () {
+            var taskID = $(this).data("id");
+            var url = "/Task/Edit/" + taskID;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching actor details.");
+                }
+            });
+        });
+
+        // Delete Task (SweetAlert Popup)
+        $(document).on("click", ".deleteTaskBtn", function () {
+            var taskID = $(this).data("id");
+            var url = "/Task/Delete/" + taskID;
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        datatype: 'json',
+                        data: { id: taskID },
+                        success: function (data) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Task has been deleted.",
+                                icon: "success"
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        },
+                        error: function () {
+                            console.error("An error occurred while deleting Task details.");
+                        }
+                    });
+                }
+            });
+        });
+
+        // Submit Task Form
+        $(document).on("submit", "#TaskLogForm", function (e) {
+            e.preventDefault(); // Prevent default form submission
+
+            var formData = new FormData(this);
+            var url = "/Task/UpsertTask";
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = response.redirectUrl;
+                    } else {
+                        $("#modalId .modal-body").html(response);
+                        //$.validator.unobtrusive.parse($("#ActorForm"));
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error("An error occurred while creating actor.");
+                }
+            });
+        });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Employee Form Reset
+        $(document).on("click", ".addEmployeeBtn", function () {
+            var url = "/Employees/Create";
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching actor details.");
+                }
+            });
+        });
+
+        //Edit Employee
+        $(document).on("click", ".editEmployeeBtn", function () {
+            var empID = $(this).data("id");
+            var url = "/Employees/Edit/" + empID;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching actor details.");
+                }
+            });
+        });
+
+        // Delete Employee
+        $(document).on("click", ".deleteEmployeeBtn", function () {
+            var empID = $(this).data("id");
+            var url = "/Employees/Delete/" + empID;
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        datatype: 'json',
+                        data: { id: empID },
+                        success: function (data) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Employee has been deleted successfully.",
+                                icon: "success"
+                            }).then((result) => {
+                                location.reload();
+                            });
+                        },
+                        error: function () {
+                            console.error("An error occurred while deleting Task details.");
+                        }
+                    });
+                }
+            });
+        });
+
+        // On edit employee
+        if (document.getElementById("DepartmentID")) {
+            var deptID = $('#DepartmentID').val(); // Get the selected department ID
+            var url = "/Employees/GetReportingPersonsListOnChange";
+
+            debugger;
+            $.ajax({
+                url,
+                type: 'GET',
+                data: { DepartmentID: deptID }, // Pass the selected department ID
+                success: function (data) {
+                    // Clear existing options
+                    $('#ReportingPerson').empty();
+
+                    // Append new options based on the received data
+                    $.each(data, function (index, item) {
+                        $('#ReportingPerson').append($('<option>', {
+                            value: item.Value,
+                            text: item.Text
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+        // On change Department
+        $(document).on("change", "#DepartmentID", function () {
+            var deptID = $(this).val(); // Get the selected department ID
+            var url = "/Employees/GetReportingPersonsListOnChange";
+
+            $.ajax({
+                url,
+                type: 'GET',
+                data: { DepartmentID: deptID }, // Pass the selected department ID
+                success: function (data) {
+                    // Clear existing options
+                    $('#ReportingPerson').empty();
+
+                    // Append new options based on the received data
+                    $.each(data, function (index, item) {
+                        $('#ReportingPerson').append($('<option>', {
+                            value: item.Value,
+                            text: item.Text
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    console.log(xhr.responseText);
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewBag.Title = "ViewEmployees";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{Html.RenderPartial("_Header"); }
+
+<div class="container-fluid">
+    <div class="text-center mb-4">
+        <h1><b>List of Reporting Employees</b></h1>
+    </div>
+
+    @{Html.RenderPartial("_EmployeesTable");}
+</div>
+
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Initializing Data Table
+            $("#EmployeeTable").DataTable();
+        });
+    </script>
+}

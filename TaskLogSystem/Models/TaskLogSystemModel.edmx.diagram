@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="d066ea7922cd424881672a84d2332a7a" Name="Diagram1">
+        <EntityTypeShape EntityType="TaskLogSystemModel.Department" Width="1.5" PointX="0.75" PointY="2.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.Employee" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Employee__Depart__398D8EEE" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Employee__Report__3A81B327" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.Task" Width="1.5" PointX="5.25" PointY="1.375" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__Approvedo__47DBAE45" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__ApproverI__46E78A0C" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__EmployeeI__45F365D3" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,32 @@
+﻿@using TaskLogSystem.Models
+
+@{
+    Employee user = null;
+    if (Session["CurrentUser"] != null)
+    {
+        user = (Employee)Session["CurrentUser"];
+    }
+}
+<div class="navbar">
+    <div class="nav-logo">
+        <a href="/"><b>TaskLog</b>System</a>
+    </div>
+    <div class="nav-items">
+        <ul>
+            @if (user.DepartmentID == 2)
+            {
+                <li><a href="/Employees/ViewEmployees/@user.EmployeeID"> View Employees </a></li>
+            }
+            @if (user.DepartmentID != 3)
+            {
+                <li><a href="/Employees/ApproveTasks"> Approve Tasks </a></li>
+            }
+            <li><a href="/Employees/Settings/@user.EmployeeID"> Profile </a></li>
+            <li><a href="/Account/Logout"> Logout </a></li>
+
+            <span class="text-light" style="cursor: default;">
+                Welcome, @user.FirstName!
+            </span>
+        </ul>
+    </div>
+</div>

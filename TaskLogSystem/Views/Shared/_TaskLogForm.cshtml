@@ -1,0 +1,49 @@
+﻿@model TaskLogSystem.Models.Task
+
+@using (Html.BeginForm("", "", FormMethod.Post, new
+{
+    id = "TaskLogForm"
+}))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="row">
+        @if (Model.TaskID != 0)
+        {
+            <input type="number" class="form-control" id="TaskID" name="TaskID" value="@Model.TaskID" readonly hidden>
+        }
+
+        <div class="col-6 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="TaskName">Task Name</label>
+                @Html.TextBox("TaskName", Model.TaskName, new { @class = "form-control mw-100", id = "TaskName", required = "required" })
+                @Html.ValidationMessageFor(model => model.TaskName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="col-6 mb-2">
+            <div class="form-group">
+                <label class="form-label text-bold" for="TaskDate">Task Date</label>
+                @{
+                    string taskDateValue = Model.TaskDate.HasValue ? Model.TaskDate.Value.ToString("yyyy-MM-dd") : string.Empty;
+                }
+                <input type="date" name="TaskDate" id="TaskDate" class="form-control" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@taskDateValue" required />
+            </div>
+        </div>
+
+
+        <div class="col-12 mb-3">
+            <div class="form-group">
+                <label class="form-label text-bold" for="TaskDescription">Task Description</label>
+                @Html.TextArea("TaskDescription", Model.TaskDescription, new { @class = "form-control mw-100", id = "TaskDescription", required = "required" })
+            </div>
+        </div>
+
+        <div class="col-6 offset-3 mb-2">
+            <div class="form-group">
+                <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat form-control">Save</button>
+            </div>
+        </div>
+    </div>
+}
+

@@ -1,0 +1,110 @@
+﻿@{
+    ViewBag.Title = "Signup";
+}
+
+@model TaskLogSystem.Models.Employee
+
+<div class="register-box">
+
+    <div class="register-logo">
+        <b>Create your new account</b>
+    </div>
+
+    <div class="row align-items-center">
+        <div class="register-box-body">
+            @using (Html.BeginForm("Signup", "Account", FormMethod.Post, new
+            {
+                id = "SignupForm"
+            }))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="row">
+                    <div class="col-6 mb-2">
+                        <div class="form-group">
+                            <label class="form-label text-bold" for="firstname">First Name</label>
+                            @Html.TextBox("firstname", null, new { @class = "form-control", id = "firstname", placeholder = "First Name", required = "required" })
+                            @Html.ValidationMessageFor(model => model.FirstName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-6 mb-2">
+                        <div class="form-group">
+                            <label class="form-label text-bold" for="lastname">Last Name</label>
+                            @Html.TextBox("lastname", null, new { @class = "form-control", id = "lastname", placeholder = "Last Name", required = "required" })
+                            @Html.ValidationMessageFor(model => model.LastName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+
+                    <div class="col-6 mb-2">
+                        <div class="form-group">
+                            <label class="form-label text-bold" for="dateofbirth">Date of Birth</label>
+                            <input type="date" name="dateofbirth" id="dateofbirth" class="form-control" max="@DateTime.Now.AddYears(-18).ToString("yyyy-MM-dd")" required />
+                        </div>
+                    </div>
+
+                    <div class="col-6 mb-3">
+                        <div class="form-group">
+                            <label class="form-label text-bold mb-3">Gender</label><br />
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="maleGender" value="M" checked />
+                                <label class="form-check-label" for="maleGender">Male</label>
+                            </div>
+
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="gender" id="femaleGender" value="F" />
+                                <label class="form-check-label" for="femaleGender">Female</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-12 mb-2">
+                        <div class="form-group">
+                            <label class="form-label text-bold" for="email">Email</label>
+                            @Html.TextBox("email", null, new { @class = "form-control mw-100", id = "email", placeholder = "example@abc.com", required = "required" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-6 mb-3">
+                        <div class="form-group">
+                            <label class="form-label text-bold" for="password">Password</label>
+                            @Html.Password("password", null, new { @class = "form-control", id = "password", placeholder = "••••••••", minlength = "8", required = "required" })
+                        </div>
+                    </div>
+
+                    <div class="col-6 mb-3">
+                        <div class="form-group">
+                            <label class="form-label text-bold" for="confirmPassword">Confirm Password</label>
+                            @Html.Password("confirmPassword", null, new { @class = "form-control", id = "confirmPassword", placeholder = "••••••••", minlength = "8", required = "required" })
+                            @Html.ValidationMessageFor(model => model.Password, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="col-12 mb-3">
+                        <div class="form-group">
+                            <label class="form-label text-bold" for="mobile_number">Mobile Number</label>
+                            @Html.TextBox("mobile_number", null, new { @class = "form-control mw-100", placeholder = "Enter Valid Phone Number (Ex: 8495673201)", minlength = "10", maxlength = "10", size = "10", required = "required" })
+                            @Html.ValidationMessageFor(model => model.MobileNumber, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 offset-3 mb-2">
+                    <div class="form-group">
+                        <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat form-control">Sign Up</button>
+                    </div>
+                </div>
+
+                <div class="col-lg-12 mb-2">
+                    <div class="text-center">
+                        Already have an account?
+                        <a href="@Url.Action("Login", "Account")"> Login here </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

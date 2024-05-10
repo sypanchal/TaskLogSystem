@@ -1,0 +1,239 @@
+﻿@using TaskLogSystem.Models
+@{
+    ViewBag.Title = "ApproveTasks";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model List<TaskLogSystem.Models.Task>
+
+@{
+    Employee user = null;
+    if (Session["CurrentUser"] != null)
+    {
+        user = (Employee)Session["CurrentUser"];
+    }
+}
+
+@{Html.RenderPartial("_Header"); }
+
+<div class="container-fluid">
+    <div class="text-center">
+        <h1><b>Approve Pending Tasks</b></h1>
+    </div>
+
+    <table class="table table-bordered table-responsive" id="ApproveTaskTable">
+        <thead>
+            <tr>
+                <th>
+                    Employee Code
+                </th>
+                <th>
+                    Employee Name
+                </th>
+                <th>
+                    Task Name
+                </th>
+
+                <th>
+                    Task Description
+                </th>
+                <th>
+                    Task Date
+                </th>
+                <th>
+                    Approver
+                </th>
+                <th>
+                    Approved or Rejected By
+                </th>
+                <th>
+                    Approved or Rejected On
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Created On
+                </th>
+                <th>
+                    Modified On
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Employee2.EmployeeCode)
+                    </td>
+                    <td>
+                        @((item != null && item.Employee2 != null) ? item.Employee2.FirstName + " " + item.Employee2.LastName : null)
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TaskName)
+                    </td>
+                    @if (item.TaskDescription != null)
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.TaskDescription)
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            No Description Added
+                        </td>
+                    }
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TaskDate)
+                    </td>
+                    <td>
+                        @((item != null && item.Employee1 != null) ? item.Employee1.FirstName + " " + item.Employee1.LastName : null)
+                    </td>
+
+                    @if (item.ApprovedorRejectedBy.HasValue)
+                    {
+                        <td>
+                            @((item != null && item.Employee != null) ? item.Employee.FirstName + " " + item.Employee.LastName : null)
+
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Pending
+                        </td>
+                    }
+
+                    @if (item.ApprovedorRejectedOn.HasValue)
+                    {
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ApprovedorRejectedOn.Value)
+                        </td>
+                    }
+                    else
+                    {
+                        <td>
+                            Pending
+                        </td>
+                    }
+
+                    @if (item.Status == "Approved")
+                    {
+                        <td class="bg-success text-white">
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                    }
+
+                    @if (item.Status == "Rejected")
+                    {
+                        <td class="bg-danger text-white">
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                    }
+
+                    @if (item.Status == "Pending")
+                    {
+                        <td class="bg-warning text-black">
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                    }
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CreatedOn)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ModifiedOn)
+                    </td>
+                    <td>
+                        @if ((item.Status == "Pending" && user.DepartmentID == 2) || user.DepartmentID == 1)
+                        {
+                            <button type="button"
+                                    class="btn btn-success approveBtn"
+                                    data-id="@item.TaskID">
+                                Approve
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-danger rejectBtn"
+                                    data-id="@item.TaskID">
+                                Reject
+                            </button>
+                        }
+                        else
+                        {
+                            <div>No Action Required</div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Initializing Data Table
+            $("#ApproveTaskTable").DataTable({
+                sorting: false,
+            });
+
+        });
+
+        // Approve Task
+        $(document).on("click", ".approveBtn", function () {
+            var taskID = +$(this).data("id");
+            var url = "/Employees/ApproveTasks/" + taskID;
+            console.log(taskID);
+            $.ajax({
+                url: url,
+                type: "POST",
+                datatype: 'json',
+                data: { id: taskID, status: "Approved" },
+                success: function (response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        location.reload();
+                    }
+                },
+                error: function () {
+                    console.error("An error occurred while Approving Task.");
+                }
+            });
+        });
+
+        // Reject Task
+        $(document).on("click", ".rejectBtn", function () {
+            var taskID = $(this).data("id");
+            var url = "/Employees/ApproveTasks/" + taskID;
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                datatype: 'json',
+                data: { id: taskID, status: "Rejected" },
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = response.redirectUrl
+                    } else {
+                        window.location.href = response.redirectUrl
+                    }
+                },
+                error: function () {
+                    console.error("An error occurred while Rejecting Task.");
+                }
+            });
+        });
+
+
+    </script>
+}
