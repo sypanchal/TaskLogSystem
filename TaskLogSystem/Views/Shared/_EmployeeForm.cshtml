@@ -4,6 +4,7 @@
 
 @{
     TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+
 }
 
 @using (Html.BeginForm(Model.EmployeeID == 0 ? "CreateEmployee" : "UpdateEmployee", "Employees", FormMethod.Post, new
@@ -29,6 +30,11 @@
                     <input type="text" class="form-control mw-100" id="EmployeeCode" name="EmployeeCode" value="@Model.EmployeeCode" readonly>
                 </div>
             </div>
+        }
+        else
+        {
+            <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" readonly>
+
         }
 
         <div class="col-6 mb-2">

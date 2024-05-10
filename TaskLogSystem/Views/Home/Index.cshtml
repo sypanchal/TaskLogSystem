@@ -289,14 +289,14 @@ else
 
         // On edit employee
         if (document.getElementById("DepartmentID")) {
+            var empID = $('#EmployeeID').val();
             var deptID = $('#DepartmentID').val(); // Get the selected department ID
             var url = "/Employees/GetReportingPersonsListOnChange";
 
-            debugger;
             $.ajax({
                 url,
                 type: 'GET',
-                data: { DepartmentID: deptID }, // Pass the selected department ID
+                data: { DepartmentID: deptID, EmployeeID: empID}, // Pass the selected department ID
                 success: function (data) {
                     // Clear existing options
                     $('#ReportingPerson').empty();
@@ -318,13 +318,14 @@ else
 
         // On change Department
         $(document).on("change", "#DepartmentID", function () {
+            var empID = $('#EmployeeID').val();
             var deptID = $(this).val(); // Get the selected department ID
             var url = "/Employees/GetReportingPersonsListOnChange";
 
             $.ajax({
                 url,
                 type: 'GET',
-                data: { DepartmentID: deptID }, // Pass the selected department ID
+                data: { DepartmentID: deptID, EmployeeID: empID }, // Pass the selected department ID
                 success: function (data) {
                     // Clear existing options
                     $('#ReportingPerson').empty();
