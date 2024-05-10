@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Helpers;
 using System.Web.Mvc;
 using TaskLogSystem.Models;
+using TaskLogSystem.CustomFilters;
 
 namespace TaskLogSystem.Controllers
 {

@@ -33,7 +33,7 @@
         }
         else
         {
-            <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" readonly>
+            <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" hidden readonly>
 
         }
 
@@ -93,7 +93,7 @@
                 <select class="form-select" id="ReportingPerson" name="ReportingPerson">
                     @{
 
-                        var reportingPersons = Model.EmployeeID == 0 ? new SelectList(_dbContext.Employees.Where(e => e.DepartmentID < 3), "EmployeeID", "FirstName") : new SelectList(_dbContext.Employees.Where(e => e.DepartmentID < Model.DepartmentID || e.EmployeeID == Model.ReportingPerson), "EmployeeID", "FirstName");
+                        var reportingPersons = Model.EmployeeID == 0 ? new SelectList(_dbContext.Employees.Where(e => e.DepartmentID < 3 && !e.IsDeleted), "EmployeeID", "FirstName") : new SelectList(_dbContext.Employees.Where(e => e.DepartmentID < Model.DepartmentID || e.EmployeeID == Model.ReportingPerson), "EmployeeID", "FirstName");
                         foreach (var d in reportingPersons)
                         {
                             <option value="@d.Value" @(Convert.ToInt32(d.Value) == Model.ReportingPerson ? "selected" : "")>@d.Text</option>

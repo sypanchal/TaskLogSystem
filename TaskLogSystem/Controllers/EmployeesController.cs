@@ -212,7 +212,7 @@ namespace TaskLogSystem.Controllers
         public ActionResult GetReportingPersonsListOnChange(int DepartmentID, int EmployeeID)
         {
             // Retrieve reporting persons list based on the selected department ID
-            List<Employee> reportingPersonsList = EmployeeID != 0 ? _dbContext.Employees.Where(e => e.DepartmentID < DepartmentID && e.EmployeeID != EmployeeID).ToList() : _dbContext.Employees.Where(e => e.DepartmentID < DepartmentID).ToList();
+            List<Employee> reportingPersonsList = EmployeeID != 0 ? _dbContext.Employees.Where(e => e.DepartmentID < DepartmentID && e.EmployeeID != EmployeeID && !e.IsDeleted).ToList() : _dbContext.Employees.Where(e => e.DepartmentID < DepartmentID && !e.IsDeleted).ToList();
 
             // Create a SelectList from the list of reporting persons
             var reportingPersonsSelectList = new SelectList(reportingPersonsList, "EmployeeID", "FirstName");
