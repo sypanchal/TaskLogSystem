@@ -24,11 +24,10 @@
 
             <input type="number" class="form-control" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" readonly hidden>
 
-
             <div class="col-4 mb-2">
                 <div class="form-group">
                     <label class="form-label text-bold" for="EmployeeCode">Employee Code</label>
-                    @Html.TextBox("EmployeeCode", Model.EmployeeCode, new { @class = "form-control mw-100", id = "EmployeeCode", required = "required", @readonly = "readonly" })
+                    @Html.TextBox("EmployeeCode", Model.EmployeeCode, new { @class = "form-control mw-100", id = "EmployeeCode", required = "required", @readonly = "readonly", @disabled = "disabled" })
                     @Html.ValidationMessageFor(model => model.EmployeeCode, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -72,7 +71,7 @@
                 <div class="form-group">
                     <label class="form-label text-bold" for="DepartmentID">Department</label>
 
-                    @Html.TextBox("DepartmentID", Model.DepartmentID == 1 ? "Director" : Model.DepartmentID == 2 ? "Manager" : "Employee", new { @class = "form-control mw-100", id = "DepartmentID", required = "required", @readonly = "readonly" })
+                    @Html.TextBox("DepartmentID", Model.DepartmentID == 1 ? "Director" : Model.DepartmentID == 2 ? "Manager" : "Employee", new { @class = "form-control mw-100", id = "DepartmentID", required = "required", @readonly = "readonly", @disabled = "disabled" })
                 </div>
             </div>
 
@@ -83,17 +82,17 @@
                         TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
 
                         var employee = _dbContext.Employees.Find(Model.ReportingPerson);
-                        string ReportingPersonName = employee.FirstName + " " + employee.LastName;
+                        string ReportingPersonName = Model.ReportingPerson != null ? employee.FirstName + " " + employee.LastName : "";
 
                     }
-                    @Html.TextBox("ReportingPerson", ReportingPersonName, new { @class = "form-control mw-100", id = "ReportingPerson", required = "required", @readonly = "readonly" })
+                    @Html.TextBox("ReportingPerson", ReportingPersonName, new { @class = "form-control mw-100", id = "ReportingPerson", required = "required", @readonly = "readonly", @disabled = "disabled" })
                 </div>
             </div>
 
             <div class="col-6 mb-2">
                 <div class="form-group">
                     <label class="form-label text-bold" for="Email">Email</label>
-                    @Html.TextBox("Email", Model.Email, new { @class = "form-control mw-100", id = "Email", placeholder = "example@abc.com", required = "required" })
+                    @Html.TextBox("Email", Model.Email, new { @class = "form-control mw-100", id = "Email", placeholder = "example@abc.com", required = "required"})
                     @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
                 </div>
             </div>

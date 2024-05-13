@@ -154,7 +154,6 @@ namespace TaskLogSystem.Controllers
             return Json(new
             {
                 success = true,
-                redirectUrl = "/Employee/ApproveTasks"
             });
         }
 
@@ -380,7 +379,7 @@ namespace TaskLogSystem.Controllers
             empObj.Email = Email;
             empObj.MobileNumber = MobileNumber;
             empObj.DepartmentID = DepartmentID;
-            empObj.ReportingPerson = ReportingPerson;
+            empObj.ReportingPerson = ReportingPerson;            
 
             if (ModelState.IsValid)
             {

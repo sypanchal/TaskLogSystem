@@ -223,9 +223,9 @@
                 data: { id: taskID, status: "Rejected" },
                 success: function (response) {
                     if (response.success) {
-                        window.location.href = response.redirectUrl
+                        location.reload();
                     } else {
-                        window.location.href = response.redirectUrl
+                        location.reload();
                     }
                 },
                 error: function () {
