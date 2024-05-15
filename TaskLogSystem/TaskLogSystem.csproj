@@ -183,6 +183,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DatatableController.cs" />
     <Compile Include="Controllers\EmployeesController.cs" />
+    <Compile Include="Controllers\ExportExcelController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
     <Compile Include="CustomFilters\ActionLogFilter.cs" />
@@ -1340,6 +1341,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Datatable\" />
+    <Folder Include="Views\ExportExcel\" />
     <Folder Include="Views\Task\" />
   </ItemGroup>
   <ItemGroup>

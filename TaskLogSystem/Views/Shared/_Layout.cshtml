@@ -19,7 +19,9 @@
     @Styles.Render("~/Content/customstyle")
 
     <!-- DataTables CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <link href="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-2.0.7/b-3.0.2/b-html5-3.0.2/datatables.min.css" rel="stylesheet">
+    @*<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">*@
+
 
     @*SweetAlert*@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -41,7 +43,12 @@
     @Scripts.Render("~/bundles/bootstrap")
 
     <!-- DataTables JS -->
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-2.0.7/b-3.0.2/b-html5-3.0.2/datatables.min.js"></script>
+    @*<script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>*@
+
 
     @RenderSection("scripts", required: false)
 </body>

@@ -11,6 +11,7 @@ using System.Web.Helpers;
 using System.Web.Mvc;
 using TaskLogSystem.Models;
 using TaskLogSystem.CustomFilters;
+using System.Collections;
 
 namespace TaskLogSystem.Controllers
 {
@@ -20,7 +21,7 @@ namespace TaskLogSystem.Controllers
 
         // POST: Datatable/LoadTasksData
         [HttpPost]
-        [RoleBasedAuthorizationFilter(1, 2, 3)]
+        [RoleBasedAuthorizationFilter(2, 3)]
         public JsonResult LoadTasksData()
         {
             Employee Emp = Session["CurrentUser"] as Employee;
@@ -43,32 +44,10 @@ namespace TaskLogSystem.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
 
                 // Getting all Task data for the current user (Employee)
-                var taskList = _dbContext.Tasks.Where(t => t.EmployeeID == Emp.EmployeeID && !t.IsDeleted).AsQueryable();
-
-                // Total number of rows count
-                totalRecord = taskList.Count();
-
-                // Search data when search value found
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    taskList = taskList.Where(x => x.TaskName.ToLower().Contains(searchValue.ToLower()) || x.TaskDescription.ToLower().Contains(searchValue.ToLower()) || (x.Employee1.FirstName + " " + x.Employee1.LastName).ToLower().Contains(searchValue.ToLower()) || (x.Employee.FirstName + " " + x.Employee.LastName).ToLower().Contains(searchValue.ToLower()) || x.Status.ToLower().Contains(searchValue.ToLower()));
-                }
-
-                // Get total count of records after search
-                filterRecord = taskList.Count();
-
-                // Sort data
-                if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
-                {
-                    var sortingExpression = sortColumn + " " + sortColumnDirection;
-                    taskList = taskList.OrderBy(sortingExpression);
-                }
-
-                // Pagination
-                List<Task> taskData = pageSize == -1 ? taskList.ToList() : taskList.Skip(skip).Take(pageSize).ToList();
+                var list = _dbContext.Tasks.Where(t => t.EmployeeID == Emp.EmployeeID && !t.IsDeleted).ToList();
 
                 // Now perform the formatting and additional processing in-memory
-                var tasks = taskData.Select(t => new
+                var formattedList = list.Select(t => new
                 {
                     t.TaskID,
                     t.TaskName,
@@ -80,10 +59,37 @@ namespace TaskLogSystem.Controllers
                     t.Status,
                     CreatedOn = t.CreatedOn.HasValue ? t.CreatedOn.Value.ToString("dd MMM yyyy hh:mm:ss") : null,
                     ModifiedOn = t.ModifiedOn.HasValue ? t.ModifiedOn.Value.ToString("dd MMM yyyy hh:mm:ss") : null
-                }).ToList();
+                }).AsQueryable();
 
-                //Returning Json Data
-                return Json(new { draw, recordsFiltered = filterRecord, recordsTotal = totalRecord, data = tasks }, JsonRequestBehavior.AllowGet);
+                // Total number of rows count
+                totalRecord = formattedList.Count();
+
+                // Search data when search value found
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    formattedList = formattedList.Where(x => 
+                    x.TaskName.ToLower().Contains(searchValue.ToLower()) || 
+                    x.TaskDescription.ToLower().Contains(searchValue.ToLower()) || 
+                    x.ApproverName.ToLower().Contains(searchValue.ToLower()) || 
+                    x.ApprovedorRejectedByName.ToLower().Contains(searchValue.ToLower()) || 
+                    x.Status.ToLower().Contains(searchValue.ToLower()));
+                }
+
+                // Get total count of records after search
+                filterRecord = formattedList.Count();
+
+                // Sort data
+                if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+                {
+                    var sortingExpression = sortColumn + " " + sortColumnDirection;
+                    formattedList = formattedList.OrderBy(sortingExpression);
+                }
+
+                // Pagination
+                var TaskData = pageSize == -1 ? formattedList.ToList() : formattedList.Skip(skip).Take(pageSize).ToList();
+
+                              //Returning Json Data
+                return Json(new { draw, recordsFiltered = filterRecord, recordsTotal = totalRecord, data = TaskData }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -118,37 +124,12 @@ namespace TaskLogSystem.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
 
                 // Getting all Employees data for the current user (Manager or Director)
-                var EmployeesList = Emp.DepartmentID == 2 ? _dbContext.Employees.Where(t => t.ReportingPerson == Emp.EmployeeID && !t.IsDeleted).AsQueryable() : _dbContext.Employees.Where(t => !t.IsDeleted && t.ReportingPerson != null).AsQueryable();
-
-                // Total number of rows count
-                totalRecord = EmployeesList.Count();
-
-                // Search data when search value found
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    EmployeesList = EmployeesList.Where(x => (x.EmployeeCode).ToLower().Contains(searchValue.ToLower()) ||
-                    (x.FirstName + " " + x.LastName).ToLower().Contains(searchValue.ToLower()) ||
-                    (x.Gender).ToLower().Contains(searchValue.ToLower()) ||
-                    (x.Email).ToLower().Contains(searchValue.ToLower()) ||
-                    (x.Department.DepartmentName).ToLower().Contains(searchValue.ToLower()) ||
-                    (x.Employee2.FirstName + " " + x.Employee2.LastName).ToLower().Contains(searchValue.ToLower()));
-                }
-
-                // Get total count of records after search
-                filterRecord = EmployeesList.Count();
-
-                // Sort data
-                if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
-                {
-                    var sortingExpression = sortColumn + " " + sortColumnDirection;
-                    EmployeesList = EmployeesList.OrderBy(sortingExpression);
-                }
-
-                // Pagination
-                List<Employee> EmployeeData = pageSize == -1 ? EmployeesList.ToList() : EmployeesList.Skip(skip).Take(pageSize).ToList();
+                var list = Emp.DepartmentID == 2 ? 
+                    _dbContext.Employees.Where(t => t.ReportingPerson == Emp.EmployeeID && !t.IsDeleted).ToList() 
+                    : _dbContext.Employees.Where(t => !t.IsDeleted && t.ReportingPerson != null).ToList();
 
                 // Now perform the formatting and additional processing in-memory
-                var employees = EmployeeData.Select(t => new
+                var formattedList = list.Select(t => new
                 {
                     t.EmployeeID,
                     t.EmployeeCode,
@@ -157,10 +138,38 @@ namespace TaskLogSystem.Controllers
                     t.Email,
                     t.Department.DepartmentName,
                     ReportingPersonName = t.Employee2.FirstName + " " + t.Employee2.LastName,
-                }).ToList();
+                }).AsQueryable();
+
+                // Total number of rows count
+                totalRecord = formattedList.Count();
+
+                // Search data when search value found
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    formattedList = formattedList.Where(x => 
+                    x.EmployeeCode.ToLower().Contains(searchValue.ToLower()) ||
+                    x.EmployeeName.ToLower().Contains(searchValue.ToLower()) ||
+                    x.Gender.ToLower().Contains(searchValue.ToLower()) ||
+                    x.Email.ToLower().Contains(searchValue.ToLower()) ||
+                    x.DepartmentName.ToLower().Contains(searchValue.ToLower()) ||
+                    x.ReportingPersonName.ToLower().Contains(searchValue.ToLower()));
+                }
+
+                // Get total count of records after search
+                filterRecord = formattedList.Count();
+
+                // Sort data
+                if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+                {
+                    var sortingExpression = sortColumn + " " + sortColumnDirection;
+                    formattedList = formattedList.OrderBy(sortingExpression);
+                }
+
+                // Pagination
+                var EmployeeData = pageSize == -1 ? formattedList.ToList() : formattedList.Skip(skip).Take(pageSize).ToList();
 
                 //Returning Json Data
-                return Json(new { draw, recordsFiltered = filterRecord, recordsTotal = totalRecord, data = employees }, JsonRequestBehavior.AllowGet);
+                return Json(new { draw, recordsFiltered = filterRecord, recordsTotal = totalRecord, data = EmployeeData }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {
@@ -184,7 +193,7 @@ namespace TaskLogSystem.Controllers
 
                 var draw = Request["draw"];
 
-                var sortColumn = Request["columns[" + Request["order[0][column]"] + "][name]"];
+                var sortColumn = Request["columns[" + Request["order[10][column]"] + "][name]"];
                 var sortColumnDirection = Request["order[0][dir]"];
                 var searchValue = Request["search[value]"];
 
@@ -195,39 +204,10 @@ namespace TaskLogSystem.Controllers
                 int skip = start != null ? Convert.ToInt32(start) : 0;
 
                 // Getting all Employees data for the current user (Manager or Director)
-                var taskList = Emp.DepartmentID == 2 ? _dbContext.Tasks.Where(t => t.ApproverID == Emp.EmployeeID && !t.IsDeleted).AsQueryable() : _dbContext.Tasks.Where(t => !t.IsDeleted).AsQueryable();
-
-                // Total number of rows count
-                totalRecord = taskList.Count();
-
-                // Search data when search value found
-                if (!string.IsNullOrEmpty(searchValue))
-                {
-                    taskList = taskList.Where(x => x.TaskName.ToLower().Contains(searchValue.ToLower())
-                    || x.TaskDescription.ToLower().Contains(searchValue.ToLower())
-                    || (x.Employee1.FirstName + " " + x.Employee1.LastName).ToLower().Contains(searchValue.ToLower())
-                    || (x.Employee.FirstName + " " + x.Employee.LastName).ToLower().Contains(searchValue.ToLower())
-                    || x.Status.ToLower().Contains(searchValue.ToLower())
-                    || x.Employee2.EmployeeCode.ToLower().Contains(searchValue.ToLower())
-                    || (x.Employee2.FirstName + " " + x.Employee2.LastName).ToLower().Contains(searchValue.ToLower())
-                    );
-                }
-
-                // Get total count of records after search
-                filterRecord = taskList.Count();
-
-                // Sort data
-                if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
-                {
-                    var sortingExpression = sortColumn + " " + sortColumnDirection;
-                    taskList = taskList.OrderBy(sortingExpression);
-                }
-
-                // Pagination
-                List<Task> taskData = pageSize == -1 ? taskList.ToList() : taskList.Skip(skip).Take(pageSize).ToList();
+                var list = Emp.DepartmentID == 2 ? _dbContext.Tasks.Where(t => t.ApproverID == Emp.EmployeeID && !t.IsDeleted).ToList() : _dbContext.Tasks.Where(t => !t.IsDeleted).ToList();
 
                 // Now perform the formatting and additional processing in-memory
-                var tasks = taskData.Select(t => new
+                var formattedList = list.Select(t => new
                 {
                     t.Employee2.EmployeeCode,
                     EmployeeName = t.Employee2.FirstName + " " + t.Employee2.LastName,
@@ -241,10 +221,40 @@ namespace TaskLogSystem.Controllers
                     t.Status,
                     CreatedOn = t.CreatedOn.HasValue ? t.CreatedOn.Value.ToString("dd MMM yyyy hh:mm:ss") : null,
                     ModifiedOn = t.ModifiedOn.HasValue ? t.ModifiedOn.Value.ToString("dd MMM yyyy hh:mm:ss") : null
-                }).ToList();
+                }).AsQueryable();
+
+                // Total number of rows count
+                totalRecord = formattedList.Count();
+
+                // Search data when search value found
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    formattedList = formattedList.Where(x =>
+                    x.TaskName.ToLower().Contains(searchValue.ToLower()) || 
+                    x.TaskDescription.ToLower().Contains(searchValue.ToLower()) || 
+                    x.ApproverName.ToLower().Contains(searchValue.ToLower()) || 
+                    x.ApprovedorRejectedByName.ToLower().Contains(searchValue.ToLower()) || 
+                    x.Status.ToLower().Contains(searchValue.ToLower()) || 
+                    x.EmployeeName.ToLower().Contains(searchValue.ToLower()) || 
+                    x.EmployeeCode.ToLower().Contains(searchValue.ToLower())
+                    );
+                }
+
+                // Get total count of records after search
+                filterRecord = formattedList.Count();
+
+                // Sort data
+                if (!string.IsNullOrEmpty(sortColumn) && !string.IsNullOrEmpty(sortColumnDirection))
+                {
+                    var sortingExpression = sortColumn + " " + sortColumnDirection;
+                    formattedList = formattedList.OrderBy(sortingExpression);
+                }
+
+                // Pagination
+                var TaskData = pageSize == -1 ? formattedList.ToList() : formattedList.Skip(skip).Take(pageSize).ToList();
 
                 //Returning Json Data
-                return Json(new { draw, recordsFiltered = filterRecord, recordsTotal = totalRecord, data = tasks }, JsonRequestBehavior.AllowGet);
+                return Json(new { draw, recordsFiltered = filterRecord, recordsTotal = totalRecord, data = TaskData }, JsonRequestBehavior.AllowGet);
             }
             catch (Exception ex)
             {

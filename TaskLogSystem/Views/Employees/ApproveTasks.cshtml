@@ -65,36 +65,63 @@
 
 @section scripts {
     <script>
+        var ApproveTaskTable = $("#ApproveTaskTable").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "filter": true,
+            "orderMulti": false,
+            "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
 
-            var ApproveTaskTable = $("#ApproveTaskTable").DataTable({
-                "processing": true,
-                "serverSide": true,
-                "filter": true,
-                "orderMulti": false,
-                //"lengthMenu": [5, 10, 20, { label: 'All', value: -1 }],
-                "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+            //"order": [10, "desc"],
 
-                "order": [10, "desc"],
+            "language": {
+                "loadingRecords": "Loading data, please wait...",
+                "zeroRecords": "No data available",
+            },
 
-                "language": {
-                    "loadingRecords": "Loading data, please wait...",
-                    "zeroRecords": "No data available",
+            "columnDefs": [
+                {
+                    "targets": [0,8,11],
+                    "orderable": false,
                 },
+                {
+                    "targets": [0,1,2,3,5,6,7,8,9,10,11],
+                    "width": "130px",
+                },
+                {
+                    "targets": [4],
+                    "width": "100px",
+                },
+            ],
 
-                "columnDefs": [
-                    {
-                        "targets": [11],
-                        "orderable": false
-                    },
-                    {
-                        "targets": [0,1,2,3,5,6,7,9,10,11],
-                        "width": "130px",
-                    },
-                    {
-                        "targets": [4],
-                        "width": "80px",
-                    },
-                ],
+            layout: {
+                top: {
+                    buttons: [
+                        {
+                            extend: 'collection',
+                            text: 'Export',
+                            buttons: [
+                                {
+                                    extend: 'excelHtml5',
+                                    title: 'Data export',
+                                    //exportOptions: {
+                                    //    columns: [1, 2, 3, 5, 7]
+                                    //}
+                                },
+                                {
+                                    extend: 'pdfHtml5',
+                                    title: 'Data export',
+                                    //exportOptions: {
+                                    //    columns: [1, 2, 3, 5, 7]
+                                    //}
+                                }
+                            ],
+                        }
+                    ],
+                }
+            },
+
+
 
                 "ajax": {
                     "url": "/Datatable/LoadAllTasksData",
@@ -135,13 +162,13 @@
                     },
                     {
                         "data": "ApproverName",
-                        "name": "ApproverID",
+                        "name": "ApproverName",
                         "title": "Approver",
                         "autoWidth": true
                     },
                     {
                         "data": "ApprovedorRejectedByName",
-                        "name": "ApprovedorRejectedBy",
+                        "name": "ApprovedorRejectedByName",
                         "title": "Approved or Rejected By",
                         "autoWidth": true
                     },
