@@ -107,15 +107,200 @@ else
 @section scripts {
     <script>
         // Initializing Data Table
-        $(document).ready(function () {
-            $("#EmployeeTable").DataTable();
-            $("#TaskTable").DataTable({
-                "columnDefs": [
-                    { "width": "170px", "targets": 1 }, // Set width for the second column
-                    { "width": "120px", "targets": 2 }  // Set width for the third column
-                ],
-                order: [[2, 'asc']]
-            });
+        var EmployeeTable = $("#EmployeeTable").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "filter": true,
+            "orderMulti": false,
+            //"lengthMenu": [5, 10, 20, { label: 'All', value: -1 }],
+            "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+
+            "order": [0, "asc"],
+            "columnDefs": [
+                {
+                    "targets": [6],
+                    "orderable": false
+                },
+            ],
+
+            "language": {
+                "loadingRecords": "Loading data, please wait...",
+                "zeroRecords": "No data available",
+            },
+
+            "ajax": {
+                "url": "/Datatable/LoadEmployeesData",
+                "type": "POST",
+                "datatype": "json"
+            },
+
+            "columns": [
+                {
+                    "data": "EmployeeCode",
+                    "name": "EmployeeCode",
+                    "title": "Employee Code",
+                    "autoWidth": true
+                },
+                {
+                    "data": "EmployeeName",
+                    "name": "EmployeeName",
+                    "title": "Employee Name",
+                    "autoWidth": true
+                },
+                {
+                    "data": "Gender",
+                    "name": "Gender",
+                    "title": "Gender",
+                    "autoWidth": true
+                },
+                {
+                    "data": "Email",
+                    "name": "Email",
+                    "title": "Email",
+                    "autoWidth": true
+                },
+                {
+                    "data": "DepartmentName",
+                    "name": "Department",
+                    "title": "Department",
+                    "autoWidth": true
+                },
+                {
+                    "data": "ReportingPersonName",
+                    "name": "ReportingPerson",
+                    "title": "Reporting Person",
+                    "autoWidth": true
+                },
+                {
+                    "data": null,
+                    "title": "Actions",
+                    "autoWidth": true,
+                    "render": function (data, type, row) {
+                        return '<td>' +
+                            '<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;"><button type="button" class="btn btn-primary editEmployeeBtn" data-id="' + row.EmployeeID + '" data-bs-toggle="modal" data-bs-target="#modalId">Edit</button>' +
+                            '<button type="button" class="btn btn-danger deleteEmployeeBtn" data-id="' + row.EmployeeID + '">Delete</button></div>' +
+                            '</td>';
+                    }
+                },
+            ]
+        });
+
+        var TaskTable = $("#TaskTable").DataTable({
+            "processing": true,
+            "serverSide": true,
+            "filter": true,
+            "orderMulti": false,
+            //"lengthMenu": [5, 10, 20, { label: 'All', value: -1 }],
+            "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+
+            "order": [8, "desc"],
+
+            "columnDefs": [
+                {
+                    "targets": [3, 4, 9],
+                    "orderable": false
+                },
+                {
+                    "targets": [0, 2, 3, 4, 5, 6, 7, 8],
+                    "width": "125px",
+                },
+            ],
+
+            "language": {
+                "loadingRecords": "Loading data, please wait...",
+                "zeroRecords": "No data available",
+            },
+
+            "ajax": {
+                "url": "/Datatable/LoadTasksData",
+                "type": "POST"
+            },
+
+            "columns": [
+                {
+                    "data": "TaskName",
+                    "name": "TaskName",
+                    "title": "Task Name",
+                    "autoWidth": true
+                },
+                {
+                    "data": "TaskDescription",
+                    "name": "TaskDescription",
+                    "title": "Task Description",
+                    "autoWidth": true
+                },
+                {
+                    "data": "TaskDate",
+                    "name": "TaskDate",
+                    "title": "Task Date",
+                    "autoWidth": true
+                },
+                {
+                    "data": "ApproverName",
+                    "name": "ApproverID",
+                    "title": "Approver",
+                    "autoWidth": true
+                },
+                {
+                    "data": "ApprovedorRejectedByName",
+                    "name": "ApprovedorRejectedBy",
+                    "title": "Approved or Rejected By",
+                    "autoWidth": true
+                },
+                {
+                    "data": "ApprovedorRejectedOn",
+                    "name": "ApprovedorRejectedOn",
+                    "title": "Approved or Rejected On",
+                    "autoWidth": true
+                },
+                {
+                    "data": "Status",
+                    "name": "Status",
+                    "title": "Status",
+                    "autoWidth": true,
+                    "render": function (data, type, row) {
+                        if (type === 'display' || type === 'filter') {
+                            var className = '';
+                            if (data === 'Approved') {
+                                className = 'bg-success text-white p-2 w-100 text-center rounded';
+                            } else if (data === 'Rejected') {
+                                className = 'bg-danger text-white p-2 w-100 text-center rounded';
+                            } else if (data === 'Pending') {
+                                className = 'bg-warning text-black p-2 w-100 text-center rounded';
+                            }
+                            return '<div class="d-flex justify-content-center "><span class="' + className + '">' + data + '</span></div>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "data": "CreatedOn",
+                    "name": "CreatedOn",
+                    "title": "Created On",
+                    "autoWidth": true
+                },
+                {
+                    "data": "ModifiedOn",
+                    "name": "ModifiedOn",
+                    "title": "Modified On",
+                    "autoWidth": true
+                },
+                {
+                    "data": null,
+                    "title": "Actions",
+                    "autoWidth": true,
+                    "render": function (data, type, row) {
+                        if (row.Status == "Pending") {
+                            return '<td>' +
+                                '<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;"><button type="button" class="btn btn-primary editTaskBtn" data-id="' + row.TaskID + '" data-bs-toggle="modal" data-bs-target="#modalId">Edit</button>' +
+                                '<button type="button" class="btn btn-danger deleteTaskBtn" data-id="' + row.TaskID + '">Delete</button></div>' +
+                                '</td>';
+                        } else {
+                            return '<td>This Task is ' + row.Status + '</td>';
+                        }
+                    }
+                },
+            ]
         });
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -178,7 +363,7 @@ else
                                 text: "Task has been deleted.",
                                 icon: "success"
                             }).then((result) => {
-                                location.reload();
+                                TaskTable.ajax.url("/Datatable/LoadTasksData").load();
                             });
                         },
                         error: function () {
@@ -191,7 +376,7 @@ else
 
         // Submit Task Form
         $(document).on("submit", "#TaskLogForm", function (e) {
-            e.preventDefault(); // Prevent default form submission
+            e.preventDefault();
 
             var formData = new FormData(this);
             var url = "/Task/UpsertTask";
@@ -204,10 +389,10 @@ else
                 contentType: false,
                 success: function (response) {
                     if (response.success) {
-                        window.location.href = response.redirectUrl;
+                        TaskTable.ajax.url("/Datatable/LoadTasksData").load();
+                        $("#modalId").modal('hide');
                     } else {
                         $("#modalId .modal-body").html(response);
-                        //$.validator.unobtrusive.parse($("#ActorForm"));
                     }
                 },
                 error: function (xhr, textStatus, errorThrown) {
@@ -276,7 +461,7 @@ else
                                 text: "Employee has been deleted successfully.",
                                 icon: "success"
                             }).then((result) => {
-                                location.reload();
+                                EmployeeTable.ajax.url("/Datatable/LoadEmployeesData").load();
                             });
                         },
                         error: function () {
@@ -296,7 +481,7 @@ else
             $.ajax({
                 url,
                 type: 'GET',
-                data: { DepartmentID: deptID, EmployeeID: empID}, // Pass the selected department ID
+                data: { DepartmentID: deptID, EmployeeID: empID }, // Pass the selected department ID
                 success: function (data) {
                     // Clear existing options
                     $('#ReportingPerson').empty();

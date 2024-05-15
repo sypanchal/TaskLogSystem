@@ -117,17 +117,18 @@ namespace TaskLogSystem.Controllers
         [RoleBasedAuthorizationFilter(1, 2)]
         public ActionResult ApproveTasks()
         {
-            Employee Emp = Session["CurrentUser"] as Employee;
+            return View();
+            //Employee Emp = Session["CurrentUser"] as Employee;
 
 
-            if (Emp.DepartmentID == 2)
-            {
-                return View(_dbContext.Tasks.Where(e => !e.IsDeleted && e.ApproverID == Emp.EmployeeID).OrderBy(e => e.ModifiedOn).ToList());
-            }
-            else
-            {
-                return View(_dbContext.Tasks.Where(e => !e.IsDeleted).OrderByDescending(e => e.ModifiedOn).ToList());
-            }
+            //if (Emp.DepartmentID == 2)
+            //{
+            //    return View(_dbContext.Tasks.Where(e => !e.IsDeleted && e.ApproverID == Emp.EmployeeID).OrderBy(e => e.ModifiedOn).ToList());
+            //}
+            //else
+            //{
+            //    return View(_dbContext.Tasks.Where(e => !e.IsDeleted).OrderByDescending(e => e.ModifiedOn).ToList());
+            //}
         }
 
         // Post: Employees/ApproveTask

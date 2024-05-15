@@ -11,6 +11,8 @@ namespace TaskLogSystem.Models
     {
         internal class TaskMetadata
         {
+            [Key]
+            public int TaskID { get; set; }
             public string TaskName { get; set; }
             public string TaskDescription { get; set; }
 

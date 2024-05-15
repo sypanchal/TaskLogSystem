@@ -27,7 +27,7 @@
             <div class="col-4 mb-2">
                 <div class="form-group">
                     <label class="form-label text-bold" for="EmployeeCode">Employee Code</label>
-                    @Html.TextBox("EmployeeCode", Model.EmployeeCode, new { @class = "form-control mw-100", id = "EmployeeCode", required = "required", @readonly = "readonly", @disabled = "disabled" })
+                    @Html.TextBox("EmployeeCode", Model.EmployeeCode, new { @class = "form-control mw-100", id = "EmployeeCode", required = "required", @readonly = "readonly", @disabled = "disabled", style = "cursor: no-drop;" })
                     @Html.ValidationMessageFor(model => model.EmployeeCode, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -71,7 +71,7 @@
                 <div class="form-group">
                     <label class="form-label text-bold" for="DepartmentID">Department</label>
 
-                    @Html.TextBox("DepartmentID", Model.DepartmentID == 1 ? "Director" : Model.DepartmentID == 2 ? "Manager" : "Employee", new { @class = "form-control mw-100", id = "DepartmentID", required = "required", @readonly = "readonly", @disabled = "disabled" })
+                    @Html.TextBox("DepartmentID", Model.DepartmentID == 1 ? "Director" : Model.DepartmentID == 2 ? "Manager" : "Employee", new { @class = "form-control mw-100", id = "DepartmentID", required = "required", @readonly = "readonly", @disabled = "disabled", style = "cursor: no-drop;" })
                 </div>
             </div>
 
@@ -85,7 +85,7 @@
                         string ReportingPersonName = Model.ReportingPerson != null ? employee.FirstName + " " + employee.LastName : "";
 
                     }
-                    @Html.TextBox("ReportingPerson", ReportingPersonName, new { @class = "form-control mw-100", id = "ReportingPerson", required = "required", @readonly = "readonly", @disabled = "disabled" })
+                    @Html.TextBox("ReportingPerson", ReportingPersonName, new { @class = "form-control mw-100", id = "ReportingPerson", required = "required", @readonly = "readonly", @disabled = "disabled", style = "cursor: no-drop;" })
                 </div>
             </div>
 

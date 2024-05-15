@@ -4,8 +4,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@model List<TaskLogSystem.Models.Task>
-
 @{
     Employee user = null;
     if (Session["CurrentUser"] != null)
@@ -16,9 +14,9 @@
 
 @{Html.RenderPartial("_Header"); }
 
-<div class="container-fluid">
+<div class="container-fluid ps-4 pe-5">
     <div class="text-center">
-        <h1><b>Approve Pending Tasks</b></h1>
+        <h1><b>Approve Tasks</b></h1>
     </div>
 
     <table class="table table-bordered table-responsive" id="ApproveTaskTable">
@@ -33,7 +31,6 @@
                 <th>
                     Task Name
                 </th>
-
                 <th>
                     Task Description
                 </th>
@@ -63,130 +60,146 @@
                 </th>
             </tr>
         </thead>
-
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Employee2.EmployeeCode)
-                    </td>
-                    <td>
-                        @((item != null && item.Employee2 != null) ? item.Employee2.FirstName + " " + item.Employee2.LastName : null)
-                    </td>
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TaskName)
-                    </td>
-                    @if (item.TaskDescription != null)
-                    {
-                        <td>
-                            @Html.DisplayFor(modelItem => item.TaskDescription)
-                        </td>
-                    }
-                    else
-                    {
-                        <td>
-                            No Description Added
-                        </td>
-                    }
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TaskDate)
-                    </td>
-                    <td>
-                        @((item != null && item.Employee1 != null) ? item.Employee1.FirstName + " " + item.Employee1.LastName : null)
-                    </td>
-
-                    @if (item.ApprovedorRejectedBy.HasValue)
-                    {
-                        <td>
-                            @((item != null && item.Employee != null) ? item.Employee.FirstName + " " + item.Employee.LastName : null)
-
-                        </td>
-                    }
-                    else
-                    {
-                        <td>
-                            Pending
-                        </td>
-                    }
-
-                    @if (item.ApprovedorRejectedOn.HasValue)
-                    {
-                        <td>
-                            @Html.DisplayFor(modelItem => item.ApprovedorRejectedOn.Value)
-                        </td>
-                    }
-                    else
-                    {
-                        <td>
-                            Pending
-                        </td>
-                    }
-
-                    @if (item.Status == "Approved")
-                    {
-                        <td class="bg-success text-white">
-                            @Html.DisplayFor(modelItem => item.Status)
-                        </td>
-                    }
-
-                    @if (item.Status == "Rejected")
-                    {
-                        <td class="bg-danger text-white">
-                            @Html.DisplayFor(modelItem => item.Status)
-                        </td>
-                    }
-
-                    @if (item.Status == "Pending")
-                    {
-                        <td class="bg-warning text-black">
-                            @Html.DisplayFor(modelItem => item.Status)
-                        </td>
-                    }
-
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CreatedOn)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ModifiedOn)
-                    </td>
-                    <td>
-                        @if ((item.Status == "Pending" && user.DepartmentID == 2) || user.DepartmentID == 1)
-                        {
-                            <button type="button"
-                                    class="btn btn-success approveBtn"
-                                    data-id="@item.TaskID">
-                                Approve
-                            </button>
-
-                            <button type="button"
-                                    class="btn btn-danger rejectBtn"
-                                    data-id="@item.TaskID">
-                                Reject
-                            </button>
-                        }
-                        else
-                        {
-                            <div>No Action Required</div>
-                        }
-                    </td>
-                </tr>
-            }
-        </tbody>
     </table>
 </div>
 
 @section scripts {
     <script>
-        $(document).ready(function () {
-            // Initializing Data Table
-            $("#ApproveTaskTable").DataTable({
-                sorting: false,
-            });
 
-        });
+            var ApproveTaskTable = $("#ApproveTaskTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                //"lengthMenu": [5, 10, 20, { label: 'All', value: -1 }],
+                "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+
+                "order": [10, "desc"],
+
+                "language": {
+                    "loadingRecords": "Loading data, please wait...",
+                    "zeroRecords": "No data available",
+                },
+
+                "columnDefs": [
+                    {
+                        "targets": [11],
+                        "orderable": false
+                    },
+                    {
+                        "targets": [0,1,2,3,5,6,7,9,10,11],
+                        "width": "130px",
+                    },
+                    {
+                        "targets": [4],
+                        "width": "80px",
+                    },
+                ],
+
+                "ajax": {
+                    "url": "/Datatable/LoadAllTasksData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+
+                "columns": [
+                    {
+                        "data": "EmployeeCode",
+                        "name": "EmployeeCode",
+                        "title": "Employee Code",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "EmployeeName",
+                        "name": "EmployeeName",
+                        "title": "Employee Name",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "TaskName",
+                        "name": "TaskName",
+                        "title": "Task Name",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "TaskDescription",
+                        "name": "TaskDescription",
+                        "title": "Task Description",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "TaskDate",
+                        "name": "TaskDate",
+                        "title": "Task Date",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "ApproverName",
+                        "name": "ApproverID",
+                        "title": "Approver",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "ApprovedorRejectedByName",
+                        "name": "ApprovedorRejectedBy",
+                        "title": "Approved or Rejected By",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "ApprovedorRejectedOn",
+                        "name": "ApprovedorRejectedOn",
+                        "title": "Approved or Rejected On",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "Status",
+                        "name": "Status",
+                        "title": "Status",
+                        "autoWidth": true,
+                        "render": function (data, type, row) {
+                            if (type === 'display' || type === 'filter') {
+                                var className = '';
+                                if (data === 'Approved') {
+                                    className = 'bg-success text-white p-2 w-100 text-center rounded';
+                                } else if (data === 'Rejected') {
+                                    className = 'bg-danger text-white p-2 w-100 text-center rounded';
+                                } else if (data === 'Pending') {
+                                    className = 'bg-warning text-black p-2 w-100 text-center rounded';
+                                }
+                                return '<div class="d-flex justify-content-center "><span class="' + className + '">' + data + '</span></div>';
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        "data": "CreatedOn",
+                        "name": "CreatedOn",
+                        "title": "Created On",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "ModifiedOn",
+                        "name": "ModifiedOn",
+                        "title": "Modified On",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": null,
+                        "title": "Actions",
+                        "autoWidth": true,
+                        "render": function (data, type, row) {
+                            if ((row.Status == "Pending" && @user.DepartmentID == 2) || @user.DepartmentID == 1) {
+                                return '<td>' +
+                                    '<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;"><button type="button" class="btn btn-success approveBtn" data-id="' + row.TaskID + '">Approve</button>' +
+                                    '<button type="button" class="btn btn-danger rejectBtn" data-id="' + row.TaskID + '">Reject</button></div>' +
+                                    '</td>';
+                            } else {
+                                return '<td>No Action is Required</td>';
+                            }
+                        }
+                    },
+                ]
+            });
 
         // Approve Task
         $(document).on("click", ".approveBtn", function () {
@@ -199,11 +212,7 @@
                 datatype: 'json',
                 data: { id: taskID, status: "Approved" },
                 success: function (response) {
-                    if (response.success) {
-                        location.reload();
-                    } else {
-                        location.reload();
-                    }
+                    ApproveTaskTable.ajax.url("/Datatable/LoadAllTasksData").load();
                 },
                 error: function () {
                     console.error("An error occurred while Approving Task.");
@@ -222,11 +231,7 @@
                 datatype: 'json',
                 data: { id: taskID, status: "Rejected" },
                 success: function (response) {
-                    if (response.success) {
-                        location.reload();
-                    } else {
-                        location.reload();
-                    }
+                    ApproveTaskTable.ajax.url("/Datatable/LoadAllTasksData").load();
                 },
                 error: function () {
                     console.error("An error occurred while Rejecting Task.");

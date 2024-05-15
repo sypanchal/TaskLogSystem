@@ -1,155 +1,38 @@
-﻿
-@model List<TaskLogSystem.Models.Task>
-
-@*@using TaskLogSystem.Models
-    @{
-        Employee user = null;
-        if (Session["CurrentUser"] != null)
-        {
-            user = (Employee)Session["CurrentUser"];
-        }
-    }*@
-
-<table class="table table-bordered table-responsive" id="TaskTable">
-    <thead>
-        <tr>
-            <th>
-                Task Name
-            </th>
-            <th>
-                Task Description
-            </th>
-            <th>
-                Task Date
-            </th>
-            <th>
-                Approver
-            </th>
-            <th>
-                Approved or Rejected By
-            </th>
-            <th>
-                Approved or Rejected On
-            </th>
-            <th>
-                Status
-            </th>
-            <th>
-                Created On
-            </th>
-            <th>
-                Modified On
-            </th>
-            <th>
-                Actions
-            </th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var item in Model)
-        {
+﻿<div class="container-fluid">
+    <table class="table table-bordered table-responsive" width="100%" id="TaskTable">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.TaskName)
-                </td>
-                @if (item.TaskDescription != null)
-                {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TaskDescription)
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        No Description Added
-                    </td>
-                }
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.TaskDate)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ApproverID)
-                </td>
-
-                @if (item.ApprovedorRejectedBy.HasValue)
-                {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ApprovedorRejectedBy.Value)
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        Pending
-                    </td>
-                }
-
-                @if (item.ApprovedorRejectedOn.HasValue)
-                {
-                    <td>
-                        @Html.DisplayFor(modelItem => item.ApprovedorRejectedOn.Value)
-                    </td>
-                }
-                else
-                {
-                    <td>
-                        Pending
-                    </td>
-                }
-
-                @if (item.Status == "Approved")
-                {
-                    <td class="bg-success text-white">
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                }
-
-                @if (item.Status == "Rejected")
-                {
-                    <td class="bg-danger text-white">
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                }
-
-                @if (item.Status == "Pending")
-                {
-                    <td class="bg-warning text-black">
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                }
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.CreatedOn)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ModifiedOn)
-                </td>
-
-                @if (item.Status == "Pending")
-                {
-                    <td>
-                        <button type="button"
-                                class="btn btn-primary editTaskBtn"
-                                data-id="@item.TaskID"
-                                data-bs-toggle="modal"
-                                data-bs-target="#modalId">
-                            Edit
-                        </button>
-
-                        <button type="button"
-                                class="btn btn-danger deleteTaskBtn"
-                                data-id="@item.TaskID">
-                            Delete
-                        </button>
-                    </td>
-                }
-                else
-                {
-                    <td>This Task is @item.Status</td>
-                }
+                <th>
+                    Task Name
+                </th>
+                <th>
+                    Task Description
+                </th>
+                <th>
+                    Task Date
+                </th>
+                <th>
+                    Approver
+                </th>
+                <th>
+                    Approved or Rejected By
+                </th>
+                <th>
+                    Approved or Rejected On
+                </th>
+                <th>
+                    Status
+                </th>
+                <th>
+                    Created On
+                </th>
+                <th>
+                    Modified On
+                </th>
+                <th>
+                    Actions
+                </th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+    </table>
+</div>

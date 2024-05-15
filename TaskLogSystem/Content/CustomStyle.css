@@ -219,3 +219,12 @@ thead th {
     text-align: center;
     vertical-align: middle;
 }
+
+/* Datatable */
+.dataTables_length {
+    margin: 3rem auto;
+}
+
+.dataTables_filter {
+    margin: 3rem auto;
+}

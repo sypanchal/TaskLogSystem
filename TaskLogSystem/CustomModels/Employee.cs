@@ -14,6 +14,7 @@ namespace TaskLogSystem.Models
     {
         internal class EmployeeMetadata
         {
+            [Key]
             public int EmployeeID { get; set; }
 
             public string EmployeeCode { get; set; }
@@ -42,6 +43,7 @@ namespace TaskLogSystem.Models
             public int DepartmentID { get; set; }
 
             public int ReportingPerson { get; set; }
+
             public bool IsDeleted { get; set; }
         }
     }

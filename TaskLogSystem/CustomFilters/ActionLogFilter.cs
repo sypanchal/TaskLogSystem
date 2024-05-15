@@ -31,6 +31,11 @@ public class ActionLogFilter : ActionFilterAttribute
 
         if (controller == "Account")
         {
+            if (action == "Login" && filterContext.HttpContext.Session["CurrentUser"] is Employee LoggedInUser)
+            {
+                // Log user login
+                Logger.Info($"{LoggedInUser.FirstName} {LoggedInUser.LastName} with email {LoggedInUser.Email} has logged in at {timestamp}");
+            }
             return;
         }
 

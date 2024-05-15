@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity.Migrations;
 using System.IO;
 using System.Linq;
+using System.Linq.Dynamic;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -89,16 +90,17 @@ namespace TaskLogSystem.Controllers
                         taskObj.CreatedOn = DateTime.Now;
                         taskObj.ModifiedOn = DateTime.Now;
 
-                    } else
+                    }
+                    else
                     {
                         taskObj = _dbContext.Tasks.Find(Task.TaskID);
-                      
+
                         taskObj.TaskName = Task.TaskName;
                         taskObj.TaskDate = taskdate.Date;
                         taskObj.TaskDescription = Task.TaskDescription;
                         taskObj.ModifiedOn = DateTime.Now;
                     }
-                   
+
                     // Add the taskObj to the database
                     _dbContext.Tasks.AddOrUpdate(taskObj);
                     _dbContext.SaveChanges();
@@ -118,7 +120,7 @@ namespace TaskLogSystem.Controllers
 
             // If we got this far, something failed, redisplay form with Errors
             return PartialView("_TaskLogForm", Task);
-        }           
+        }
 
         // POST: Task/Delete/5
         [HttpPost]

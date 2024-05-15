@@ -20,20 +20,20 @@
             <div class="col-6 mb-2">
                 <div class="form-group">
                     <label class="form-label text-bold" for="EmployeeID">Employee ID</label>
-                    <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" readonly>
+                    <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" readonly style="cursor: no-drop;">
                 </div>
             </div>
 
             <div class="col-6 mb-2">
                 <div class="form-group">
                     <label class="form-label text-bold" for="EmployeeCode">Employee Code</label>
-                    <input type="text" class="form-control mw-100" id="EmployeeCode" name="EmployeeCode" value="@Model.EmployeeCode" readonly>
+                    <input type="text" class="form-control mw-100" id="EmployeeCode" name="EmployeeCode" value="@Model.EmployeeCode" readonly style="cursor: no-drop;">
                 </div>
             </div>
         }
         else
         {
-            <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" hidden readonly>
+            <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" hidden readonly style="cursor: no-drop;">
 
         }
 

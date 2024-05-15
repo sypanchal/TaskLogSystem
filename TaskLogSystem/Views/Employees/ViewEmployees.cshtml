@@ -14,12 +14,58 @@
     @{Html.RenderPartial("_EmployeesTable");}
 </div>
 
-
 @section scripts {
     <script>
         $(document).ready(function () {
-            // Initializing Data Table
-            $("#EmployeeTable").DataTable();
+            $("#EmployeeTable").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "orderMulti": false,
+                //"lengthMenu": [2, 5, 10, 20, { label: 'All', value: -1 }],
+                "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+
+                "order": [0, "asc"],
+
+                "ajax": {
+                    "url": "/Datatable/LoadEmployeesData",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+
+                "columns": [
+                    {
+                        "data": "EmployeeCode",
+                        "name": "EmployeeCode",
+                        "title": "Employee Code",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "EmployeeName",
+                        "name": "EmployeeName",
+                        "title": "Employee Name",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "Gender",
+                        "name": "Gender",
+                        "title": "Gender",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "Email",
+                        "name": "Email",
+                        "title": "Email",
+                        "autoWidth": true
+                    },
+                    {
+                        "data": "DepartmentName",
+                        "name": "Department",
+                        "title": "Department",
+                        "autoWidth": true
+                    }
+                ]
+            });
         });
     </script>
 }
