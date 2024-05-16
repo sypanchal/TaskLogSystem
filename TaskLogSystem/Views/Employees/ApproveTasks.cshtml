@@ -19,6 +19,15 @@
         <h1><b>Approve Tasks</b></h1>
     </div>
 
+    @*<div class="StatusDropdown">
+        <select id="Status" name="Status" class="form-select">
+            <option value="" selected>Select</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Pending">Pending</option>
+        </select>
+    </div>*@
+
     <table class="table table-bordered table-responsive" id="ApproveTaskTable">
         <thead>
             <tr>
@@ -69,14 +78,19 @@
             "processing": true,
             "serverSide": true,
             "filter": true,
+            "searching": true,
             "orderMulti": false,
             "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
 
-            //"order": [10, "desc"],
-
+            "order": [10, "desc"],
+            "pagingType": "simple_numbers",
             "language": {
                 "loadingRecords": "Loading data, please wait...",
                 "zeroRecords": "No data available",
+                paginate: {
+                    next: '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+                    previous: '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
+                }
             },
 
             "columnDefs": [
@@ -85,12 +99,24 @@
                     "orderable": false,
                 },
                 {
-                    "targets": [0,1,2,3,5,6,7,8,9,10,11],
-                    "width": "130px",
+                    "targets": [0],
+                    "width": "140px",
+                },
+                {
+                    "targets": [1,2,5,6],
+                    "width": "170px",
+                },
+                {
+                    "targets": [3],
+                    "width": "215px",
                 },
                 {
                     "targets": [4],
-                    "width": "100px",
+                    "width": "120px",
+                },
+                {
+                    "targets": [7,9,10],
+                    "width": "140px",
                 },
             ],
 
@@ -103,130 +129,120 @@
                             buttons: [
                                 {
                                     extend: 'excelHtml5',
-                                    title: 'Data export',
-                                    //exportOptions: {
-                                    //    columns: [1, 2, 3, 5, 7]
-                                    //}
+                                    text: '<i class="fa fa-print"></i> Print',
+                                    title: 'Task Approve/Reject Status',
+                                    exportOptions: {
+                                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                                    },
                                 },
                                 {
                                     extend: 'pdfHtml5',
-                                    title: 'Data export',
-                                    //exportOptions: {
-                                    //    columns: [1, 2, 3, 5, 7]
-                                    //}
-                                }
+                                    text: '<i class="fa fa-file-pdf-o"></i> PDF',
+                                    title: 'Task Approve/Reject Status',
+                                    orientation: 'landscape',
+                                    pageSize: 'A3',
+                                    exportOptions: {
+                                        columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+                                    },
+                                },
                             ],
-                        }
+                        },
                     ],
                 }
             },
 
+            "ajax": {
+                "url": "/Datatable/LoadAllTasksData",
+                "type": "POST",
+                "datatype": "json"
+            },
 
-
-                "ajax": {
-                    "url": "/Datatable/LoadAllTasksData",
-                    "type": "POST",
-                    "datatype": "json"
+            "columns": [
+                {
+                    "data": "EmployeeCode",
+                    "name": "EmployeeCode",
+                    "title": "Employee Code",
                 },
-
-                "columns": [
-                    {
-                        "data": "EmployeeCode",
-                        "name": "EmployeeCode",
-                        "title": "Employee Code",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "EmployeeName",
-                        "name": "EmployeeName",
-                        "title": "Employee Name",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "TaskName",
-                        "name": "TaskName",
-                        "title": "Task Name",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "TaskDescription",
-                        "name": "TaskDescription",
-                        "title": "Task Description",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "TaskDate",
-                        "name": "TaskDate",
-                        "title": "Task Date",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "ApproverName",
-                        "name": "ApproverName",
-                        "title": "Approver",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "ApprovedorRejectedByName",
-                        "name": "ApprovedorRejectedByName",
-                        "title": "Approved or Rejected By",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "ApprovedorRejectedOn",
-                        "name": "ApprovedorRejectedOn",
-                        "title": "Approved or Rejected On",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "Status",
-                        "name": "Status",
-                        "title": "Status",
-                        "autoWidth": true,
-                        "render": function (data, type, row) {
-                            if (type === 'display' || type === 'filter') {
-                                var className = '';
-                                if (data === 'Approved') {
-                                    className = 'bg-success text-white p-2 w-100 text-center rounded';
-                                } else if (data === 'Rejected') {
-                                    className = 'bg-danger text-white p-2 w-100 text-center rounded';
-                                } else if (data === 'Pending') {
-                                    className = 'bg-warning text-black p-2 w-100 text-center rounded';
-                                }
-                                return '<div class="d-flex justify-content-center "><span class="' + className + '">' + data + '</span></div>';
+                {
+                    "data": "EmployeeName",
+                    "name": "EmployeeName",
+                    "title": "Employee Name",
+                },
+                {
+                    "data": "TaskName",
+                    "name": "TaskName",
+                    "title": "Task Name",
+                },
+                {
+                    "data": "TaskDescription",
+                    "name": "TaskDescription",
+                    "title": "Task Description",
+                },
+                {
+                    "data": "TaskDate",
+                    "name": "TaskDate",
+                    "title": "Task Date",
+                },
+                {
+                    "data": "ApproverName",
+                    "name": "ApproverName",
+                    "title": "Approver",
+                },
+                {
+                    "data": "ApprovedorRejectedByName",
+                    "name": "ApprovedorRejectedByName",
+                    "title": "Approved or Rejected By",
+                },
+                {
+                    "data": "ApprovedorRejectedOn",
+                    "name": "ApprovedorRejectedOn",
+                    "title": "Approved or Rejected On",
+                },
+                {
+                    "data": "Status",
+                    "name": "Status",
+                    "title": "Status",
+                    "render": function (data, type, row) {
+                        if (type === 'display' || type === 'filter') {
+                            var className = '';
+                            if (data === 'Approved') {
+                                className = 'bg-success text-white p-2 w-100 text-center rounded';
+                            } else if (data === 'Rejected') {
+                                className = 'bg-danger text-white p-2 w-100 text-center rounded';
+                            } else if (data === 'Pending') {
+                                className = 'bg-warning text-black p-2 w-100 text-center rounded';
                             }
-                            return data;
+                            return '<div class="d-flex justify-content-center "><span class="' + className + '">' + data + '</span></div>';
                         }
-                    },
-                    {
-                        "data": "CreatedOn",
-                        "name": "CreatedOn",
-                        "title": "Created On",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "ModifiedOn",
-                        "name": "ModifiedOn",
-                        "title": "Modified On",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": null,
-                        "title": "Actions",
-                        "autoWidth": true,
-                        "render": function (data, type, row) {
-                            if ((row.Status == "Pending" && @user.DepartmentID == 2) || @user.DepartmentID == 1) {
-                                return '<td>' +
-                                    '<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;"><button type="button" class="btn btn-success approveBtn" data-id="' + row.TaskID + '">Approve</button>' +
-                                    '<button type="button" class="btn btn-danger rejectBtn" data-id="' + row.TaskID + '">Reject</button></div>' +
-                                    '</td>';
-                            } else {
-                                return '<td>No Action is Required</td>';
-                            }
+                        return data;
+                    }
+                },
+                {
+                    "data": "CreatedOn",
+                    "name": "CreatedOn",
+                    "title": "Created On",
+                },
+                {
+                    "data": "ModifiedOn",
+                    "name": "ModifiedOn",
+                    "title": "Modified On",
+                },
+                {
+                    "data": null,
+                    "title": "Actions",
+                    "render": function (data, type, row) {
+                        if ((row.Status == "Pending" && @user.DepartmentID == 2) || @user.DepartmentID == 1) {
+                            return '<td>' +
+                                '<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;"><button type="button" class="btn btn-success approveBtn" data-id="' + row.TaskID + '">Approve</button>' +
+                                '<button type="button" class="btn btn-danger rejectBtn" data-id="' + row.TaskID + '">Reject</button></div>' +
+                                '</td>';
+                        } else {
+                            return '<td>No Action is Required</td>';
                         }
-                    },
-                ]
-            });
+                    }
+                },
+            ]
+        });
 
         // Approve Task
         $(document).on("click", ".approveBtn", function () {
@@ -265,7 +281,5 @@
                 }
             });
         });
-
-
     </script>
 }
