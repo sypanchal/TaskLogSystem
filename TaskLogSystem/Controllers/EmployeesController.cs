@@ -19,6 +19,12 @@ namespace TaskLogSystem.Controllers
     {
         private TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
 
+        // GET: Employees/TaskEntry
+        public ActionResult TaskEntry()
+        {
+            return View();
+        }
+
         // GET: Employees/Settings/5
         public ActionResult Settings(int? id)
         {
@@ -112,23 +118,11 @@ namespace TaskLogSystem.Controllers
             return View("Settings", employee);
         }
 
-
         // GET: Employees/ApproveTasks
         [RoleBasedAuthorizationFilter(1, 2)]
         public ActionResult ApproveTasks()
         {
             return View();
-            //Employee Emp = Session["CurrentUser"] as Employee;
-
-
-            //if (Emp.DepartmentID == 2)
-            //{
-            //    return View(_dbContext.Tasks.Where(e => !e.IsDeleted && e.ApproverID == Emp.EmployeeID).OrderBy(e => e.ModifiedOn).ToList());
-            //}
-            //else
-            //{
-            //    return View(_dbContext.Tasks.Where(e => !e.IsDeleted).OrderByDescending(e => e.ModifiedOn).ToList());
-            //}
         }
 
         // Post: Employees/ApproveTask
@@ -159,10 +153,10 @@ namespace TaskLogSystem.Controllers
         }
 
         // GET: Employees/ViewEmployees
-        [RoleBasedAuthorizationFilter(2)]
-        public ActionResult ViewEmployees(int id)
+        [RoleBasedAuthorizationFilter(1, 2)]
+        public ActionResult ViewEmployees()
         {
-            return View(_dbContext.Employees.Where(e => !e.IsDeleted && e.ReportingPerson == id).ToList());
+            return View();
         }
 
         // GET: Employees/Create
@@ -209,10 +203,10 @@ namespace TaskLogSystem.Controllers
         // Helper method to get the list of Ancestor Reporting Persons
 
         [RoleBasedAuthorizationFilter(1)]
-        public ActionResult GetReportingPersonsListOnChange(int DepartmentID, int EmployeeID)
+        public ActionResult GetReportingPersonsListOnChange(int RoleID, int EmployeeID)
         {
             // Retrieve reporting persons list based on the selected department ID
-            List<Employee> reportingPersonsList = EmployeeID != 0 ? _dbContext.Employees.Where(e => e.DepartmentID < DepartmentID && e.EmployeeID != EmployeeID && !e.IsDeleted).ToList() : _dbContext.Employees.Where(e => e.DepartmentID < DepartmentID && !e.IsDeleted).ToList();
+            List<Employee> reportingPersonsList = EmployeeID != 0 ? _dbContext.Employees.Where(e => e.RoleID < RoleID && e.EmployeeID != EmployeeID && !e.IsDeleted).ToList() : _dbContext.Employees.Where(e => e.RoleID < RoleID && !e.IsDeleted).ToList();
 
             // Create a SelectList from the list of reporting persons
             var reportingPersonsSelectList = new SelectList(reportingPersonsList, "EmployeeID", "FirstName");
@@ -226,11 +220,13 @@ namespace TaskLogSystem.Controllers
         [RoleBasedAuthorizationFilter(1)]
         public ActionResult CreateEmployee(Employee employee, string confirmPassword)
         {
+
             Employee ReportingEmployee = _dbContext.Employees.Find(employee.ReportingPerson);
-            // Check if the departmentID of employee is lesser than reportingPerson's departmentID
-            if (employee.DepartmentID < ReportingEmployee.DepartmentID)
+
+            // Check if the RoleID of employee is lesser than reportingPerson's RoleID
+            if (ReportingEmployee != null && employee.RoleID < ReportingEmployee.RoleID)
             {
-                ModelState.AddModelError("ReportingPerson", "ReportingPerson must have higher DepartmentID...");
+                ModelState.AddModelError("ReportingPerson", "ReportingPerson must have higher RoleID...");
             }
 
             //Validate firstname and lastname using regex
@@ -297,15 +293,17 @@ namespace TaskLogSystem.Controllers
                     empObj.Email = employee.Email;
                     empObj.Password = hashedPassword;
                     empObj.MobileNumber = employee.MobileNumber;
-                    empObj.DepartmentID = employee.DepartmentID;
+                    empObj.RoleID = employee.RoleID;
                     empObj.ReportingPerson = employee.ReportingPerson;
 
                     // Add the employee to the database
                     _dbContext.Employees.Add(empObj);
                     _dbContext.SaveChanges();
 
-                    return RedirectToAction("Index", "Home");
-
+                    return Json(new
+                    {
+                        success = true,
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -321,13 +319,13 @@ namespace TaskLogSystem.Controllers
         //POST: Employees/UpdateEmployee
         [HttpPost]
         [RoleBasedAuthorizationFilter(1)]
-        public ActionResult UpdateEmployee(int EmployeeID, string FirstName, string LastName, string DateOfBirth, string Gender, string Email, string MobileNumber, int DepartmentID, int ReportingPerson)
+        public ActionResult UpdateEmployee(int EmployeeID, string FirstName, string LastName, string DateOfBirth, string Gender, string Email, string MobileNumber, int RoleID, int ReportingPerson)
         {
             Employee ReportingEmployee = _dbContext.Employees.Find(ReportingPerson);
             // Check if the departmentID of employee is lesser than reportingPerson's departmentID
-            if (DepartmentID < ReportingEmployee.DepartmentID)
+            if (ReportingEmployee != null && RoleID < ReportingEmployee.RoleID)
             {
-                ModelState.AddModelError("ReportingPerson", "ReportingPerson must have higher DepartmentID...");
+                ModelState.AddModelError("ReportingPerson", "ReportingPerson must have higher RoleID...");
             }
 
             //Validate firstname and lastname using regex
@@ -379,8 +377,8 @@ namespace TaskLogSystem.Controllers
             empObj.Gender = Gender;
             empObj.Email = Email;
             empObj.MobileNumber = MobileNumber;
-            empObj.DepartmentID = DepartmentID;
-            empObj.ReportingPerson = ReportingPerson;            
+            empObj.RoleID = RoleID;
+            empObj.ReportingPerson = ReportingPerson;
 
             if (ModelState.IsValid)
             {
@@ -390,7 +388,7 @@ namespace TaskLogSystem.Controllers
                     // Add the employee to the database
                     _dbContext.SaveChanges();
 
-                    return RedirectToAction("Index", "Home");
+                    return Json(new { success = true });
                 }
                 catch (Exception ex)
                 {

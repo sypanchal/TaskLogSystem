@@ -1,70 +1,476 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "ViewEmployees";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@{Html.RenderPartial("_Header"); }
+@using TaskLogSystem.Models
+
+@{
+    TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+    
+    Employee user = null;
+
+    if (Session["CurrentUser"] != null)
+    {
+        user = (Employee)Session["CurrentUser"];
+    }
+
+    // Get a list of permissions, which has assigned to user for this Menu
+    var permissionsList = _dbContext.GetUserPermissionsForMenu(user.EmployeeID, "View Employees").ToList();
+}
+
+@{Html.RenderPartial("_Header");}
 
 <div class="container-fluid">
-    <div class="text-center mb-4">
-        <h1><b>List of Reporting Employees</b></h1>
+    <div class="text-center">
+        <h1><b>List of Employees</b></h1>
     </div>
 
-    @{Html.RenderPartial("_EmployeesTable");}
+    @*Check if user has access to create employee*@
+    @if (permissionsList.Contains("Create"))
+    {
+        <button type="button"
+                class="btn btn-primary btn-lg addEmployeeBtn float-end mx-5"
+                data-bs-toggle="modal"
+                data-bs-target="#modalId">
+            Add Employee
+        </button>
+
+        <div class="modal fade"
+             id="modalId"
+             tabindex="-1"
+             data-bs-backdrop="static"
+             data-bs-keyboard="false"
+             role="dialog"
+             aria-labelledby="modalTitleId"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg"
+                 role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="taskDetails">Employee Details</h3>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        @{Html.RenderPartial("_EmployeeForm", new TaskLogSystem.Models.Employee());}
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
+    @*Check if user has access to view employee list*@
+    @if (permissionsList.Contains("Read"))
+    {
+        <table class="table table-bordered table-responsive" style="width: 100%;" id="EmployeeTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Employee Code</th>
+                    <th>Employee Name</th>
+                    <th>Gender</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    @if (permissionsList.Contains("Update") || permissionsList.Contains("Delete"))
+                    {
+                        <th>Reporting Person</th>
+                        <th>Action</th>
+                    }
+                </tr>
+            </thead>
+        </table>
+    }
 </div>
 
 @section scripts {
     <script>
-        $(document).ready(function () {
-            $("#EmployeeTable").DataTable({
-                "processing": true,
-                "serverSide": true,
-                "filter": true,
-                "orderMulti": false,
-                //"lengthMenu": [2, 5, 10, 20, { label: 'All', value: -1 }],
-                "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+        var EmployeeTable = $("#EmployeeTable").DataTable({
+            //"processing": true,
+            "serverSide": true,
+            "filter": true,
+            "orderMulti": false,
+            "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+            "pagingType": "simple_numbers",
+            "order": [1, "asc"],
 
-                "order": [0, "asc"],
+            "columnDefs": [
+                {
+                    "targets": [0],
+                    "orderable": false
+                },
+            ],
 
-                "ajax": {
-                    "url": "/Datatable/LoadEmployeesData",
-                    "type": "POST",
-                    "datatype": "json"
+            @if (permissionsList.Contains("Update") || permissionsList.Contains("Delete"))
+            {
+                <text>
+                    "columnDefs": [
+                        {
+                            "targets": [7],
+                            "orderable": false
+                        },
+            ],
+                </text>
+            }
+
+            "language": {
+                "loadingRecords": "Loading data, please wait...",
+                "zeroRecords": "No data available",
+                paginate: {
+                    next: '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+                    previous: '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
+                }
+            },
+
+            "ajax": {
+                "url": "/Datatable/LoadEmployeesData",
+                "type": "POST",
+                "datatype": "json"
+            },
+
+            "columns": [
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        return `
+                            <div class="d-flex justify-content-center align-items-center" style="gap: 1rem;">
+                                <button type="button" class="btn btn-info showEmployeeBtn" data-id="${row.EmployeeID}">View Tasks</button>
+                            </div>
+                        `;
+                    }
+                },
+                {
+                    "data": "EmployeeCode",
+                    "name": "EmployeeCode",
+                },
+                {
+                    "data": "EmployeeName",
+                    "name": "EmployeeName",
+                },
+                {
+                    "data": "Gender",
+                    "name": "Gender",
+                },
+                {
+                    "data": "Email",
+                    "name": "Email",
+                },
+                {
+                    "data": "RoleName",
+                    "name": "RoleName",
                 },
 
-                "columns": [
+                @if (permissionsList.Contains("Update") || permissionsList.Contains("Delete"))
+                {
+                    <text>
                     {
-                        "data": "EmployeeCode",
-                        "name": "EmployeeCode",
-                        "title": "Employee Code",
-                        "autoWidth": true
+                        "data": "ReportingPersonName",
+                        "name": "ReportingPersonName",
                     },
                     {
-                        "data": "EmployeeName",
-                        "name": "EmployeeName",
-                        "title": "Employee Name",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "Gender",
-                        "name": "Gender",
-                        "title": "Gender",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "Email",
-                        "name": "Email",
-                        "title": "Email",
-                        "autoWidth": true
-                    },
-                    {
-                        "data": "DepartmentName",
-                        "name": "Department",
-                        "title": "Department",
-                        "autoWidth": true
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return `
+                            <div class="d-flex justify-content-center align-items-center" style="gap: 1rem;">
+                                <button type="button" class="btn btn-primary editEmployeeBtn" data-id="${row.EmployeeID}" data-bs-toggle="modal" data-bs-target="#modalId">Update</button>
+                                <button type="button" class="btn btn-danger deleteEmployeeBtn" data-id="${row.EmployeeID}">Delete</button>
+                            </div>
+                        `;
+                        }
                     }
-                ]
+                    </text>
+                }
+            ],
+        });
+
+        // Child table for each employee to show his/her tasks
+        EmployeeTable.on("click", ".showEmployeeBtn", function (e) {
+            e.preventDefault();
+
+            let tr = $(this).closest("tr");
+            let row = EmployeeTable.row(tr);
+            let EmployeeID = row.data().EmployeeID;
+
+            if (row.child.isShown()) {
+                $(this).html("Show");
+                row.child.hide();
+            } else {
+                $(this).html("Hide");
+                let childTable = $(`
+                    <table class="table table-bordered table-responsive" id="childTable">
+                        <thead>
+                            <tr>
+                                <th>Task Name</th>
+                                <th>Task Description</th>
+                                <th>Task Date</th>
+                                <th>Approver</th>
+                                <th>Approved or Rejected By</th>
+                                <th>Approved or Rejected On</th>
+                                <th>Status</th>
+                                <th>Created On</th>
+                                <th>Modified On</th>
+                            </tr>
+                        </thead>
+                    </table>
+                `);
+
+                row.child(childTable).show();
+
+                childTable.DataTable({
+                    //"processing": true,
+                    "serverSide": true,
+                    "filter": true,
+                    "orderMulti": false,
+                    "lengthMenu": [[5, 10, 20, -1], [5, 10, 20, "All"]],
+                    "order": [8, "desc"],
+                    "pagingType": "simple_numbers",
+
+                    "language": {
+                        "loadingRecords": "Loading data, please wait...",
+                        "zeroRecords": "No data available",
+                        paginate: {
+                            next: '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+                            previous: '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
+                        }
+                    },
+
+                    "ajax": {
+                        "url": "/Datatable/LoadEmployeeTaskData",
+                        data: { EmployeeID },
+                        "type": "POST",
+                        "datatype": "json"
+                    },
+
+                    "columnDefs": [
+                        {
+                            "targets": [6, 8],
+                            "orderable": false,
+                        },
+                        {
+                            "targets": [0, 2, 3, 4],
+                            "width": "200px",
+                        },
+                        {
+                            "targets": [5, 7, 8],
+                            "width": "150px",
+                        },
+                    ],
+
+                    "columns": [
+                        {
+                            "data": "TaskName",
+                            "name": "TaskName",
+                            "title": "Task Name",
+                        },
+                        {
+                            "data": "TaskDescription",
+                            "name": "TaskDescription",
+                            "title": "Task Description",
+                        },
+                        {
+                            "data": "TaskDate",
+                            "name": "TaskDate",
+                            "title": "Task Date",
+                        },
+                        {
+                            "data": "ApproverName",
+                            "name": "ApproverName",
+                            "title": "Approver",
+                        },
+                        {
+                            "data": "ApprovedorRejectedByName",
+                            "name": "ApprovedorRejectedByName",
+                            "title": "Approved or Rejected By",
+                        },
+                        {
+                            "data": "ApprovedorRejectedOn",
+                            "name": "ApprovedorRejectedOn",
+                            "title": "Approved or Rejected On",
+                        },
+                        {
+                            "data": "Status",
+                            "name": "Status",
+                            "title": "Status",
+                            "render": function (data, type, row) {
+                                if (type === 'display' || type === 'filter') {
+                                    var className = '';
+                                    if (data === 'Approved') {
+                                        className = 'bg-success text-white p-2 w-100 text-center rounded';
+                                    } else if (data === 'Rejected') {
+                                        className = 'bg-danger text-white p-2 w-100 text-center rounded';
+                                    } else if (data === 'Pending') {
+                                        className = 'bg-warning text-black p-2 w-100 text-center rounded';
+                                    }
+                                    return '<div class="d-flex justify-content-center "><span class="' + className + '">' + data + '</span></div>';
+                                }
+                                return data;
+                            }
+                        },
+                        {
+                            "data": "CreatedOn",
+                            "name": "CreatedOn",
+                            "title": "Created On",
+                        },
+                        {
+                            "data": "ModifiedOn",
+                            "name": "ModifiedOn",
+                            "title": "Modified On",
+                        },
+                    ],
+                });
+            }
+        });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Employee Form Reset
+        $(document).on("click", ".addEmployeeBtn", function () {
+            var url = "/Employees/Create";
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching Employee details.");
+                }
+            });
+        });
+
+        //Edit Employee
+        $(document).on("click", ".editEmployeeBtn", function () {
+            var empID = $(this).data("id");
+            var url = "/Employees/Edit/" + empID;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching Employee details.");
+                }
+            });
+        });
+
+        // Delete Employee
+        $(document).on("click", ".deleteEmployeeBtn", function () {
+            var empID = $(this).data("id");
+            var url = "/Employees/Delete/" + empID;
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        datatype: 'json',
+                        data: { id: empID },
+                        success: function (data) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Employee has been deleted successfully.",
+                                icon: "success"
+                            }).then((result) => {
+                                EmployeeTable.ajax.url("/Datatable/LoadEmployeesData").load();
+                            });
+                        },
+                        error: function () {
+                            console.error("An error occurred while deleting Employee details.");
+                        }
+                    });
+                }
+            });
+        });
+
+        // On change Role
+        const fn = () => {
+            var empID = $('#EmployeeID').val();
+            var roleID = $('#RoleID').val();
+            var url = "/Employees/GetReportingPersonsListOnChange";
+
+            $.ajax({
+                url,
+                type: 'GET',
+                data: { RoleID: roleID, EmployeeID: empID },
+                success: function (data) {
+
+                    // Clear existing options
+                    $('#ReportingPerson').empty();
+
+                    if (data.length == 0) {
+                        $('#ReportingPerson').append($('<option>', {
+                            value: 101,
+                            text: "Saurabh",
+                            selected: true,
+                            disabled: true
+                        }));
+                    }
+
+                    // Append new options based on the received data
+                    $.each(data, function (index, item) {
+                        $('#ReportingPerson').append($('<option>', {
+                            value: item.Value,
+                            text: item.Text
+                        }));
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // Handle error
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+        // On edit employee
+        $(document).ready(function () {
+            if (document.getElementById("RoleID")) {
+                fn();
+            }
+        });
+
+        $(document).on("change", "#RoleID", function () {
+            fn();
+        });
+
+        // On Employee Form Submit
+        $(document).on("submit", "#EmployeeForm", function (e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            var url = $(this).attr("action");
+
+            console.log(url)
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        EmployeeTable.ajax.url("/Datatable/LoadEmployeesData").load();
+                        $("#modalId").modal('hide');
+                    } else {
+                        $("#modalId .modal-body").html(response);
+                        fn();
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error("An error occurred while updating Employee.");
+                }
             });
         });
     </script>

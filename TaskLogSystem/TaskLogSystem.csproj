@@ -183,7 +183,6 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DatatableController.cs" />
     <Compile Include="Controllers\EmployeesController.cs" />
-    <Compile Include="Controllers\ExportExcelController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TaskController.cs" />
     <Compile Include="CustomFilters\ActionLogFilter.cs" />
@@ -192,13 +191,29 @@
     <Compile Include="CustomFilters\RoleBasedAuthorizationFilter.cs" />
     <Compile Include="CustomModels\Employee.cs" />
     <Compile Include="CustomModels\Task.cs" />
+    <Compile Include="CustomModels\UserMenuPermission.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Department.cs">
+    <Compile Include="Models\Access.cs">
       <DependentUpon>TaskLogSystemModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Employee.cs">
+      <DependentUpon>TaskLogSystemModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\GetAccessibleMenus_Result.cs">
+      <DependentUpon>TaskLogSystemModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Menu.cs">
+      <DependentUpon>TaskLogSystemModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\MenuRoleAccess.cs">
+      <DependentUpon>TaskLogSystemModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Role.cs">
+      <DependentUpon>TaskLogSystemModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\RoleAccess.cs">
       <DependentUpon>TaskLogSystemModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\Task.cs">
@@ -1167,6 +1182,7 @@
       <DependentUpon>TaskLogSystemModel.edmx</DependentUpon>
       <LastGenOutput>TaskLogSystemModel.cs</LastGenOutput>
     </Content>
+    <Content Include="Scripts\app.js" />
     <Content Include="Scripts\bootstrap.bundle.js" />
     <Content Include="Scripts\bootstrap.bundle.min.js" />
     <Content Include="Scripts\bootstrap.esm.js" />
@@ -1294,6 +1310,7 @@
     <Content Include="Content\Assets\plugins\input-mask\phone-codes\phone-be.json" />
     <Content Include="Content\Assets\plugins\input-mask\phone-codes\phone-codes.json" />
     <Content Include="libman.json" />
+    <Content Include="nlog.config" />
     <EntityDeploy Include="Models\TaskLogSystemModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
       <LastGenOutput>TaskLogSystemModel.Designer.cs</LastGenOutput>
@@ -1301,7 +1318,6 @@
     <Content Include="Models\TaskLogSystemModel.edmx.diagram">
       <DependentUpon>TaskLogSystemModel.edmx</DependentUpon>
     </Content>
-    <Content Include="nlog.config" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
@@ -1328,7 +1344,6 @@
     <Content Include="Views\Account\Signup.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Shared\_TaskLogForm.cshtml" />
-    <Content Include="Views\Shared\_EmployeesTable.cshtml" />
     <Content Include="Views\Employees\Settings.cshtml" />
     <Content Include="Views\Shared\_EmployeeForm.cshtml" />
     <Content Include="Views\Shared\_TasksTable.cshtml" />
@@ -1337,12 +1352,10 @@
     <Content Include="Views\Employees\ViewEmployees.cshtml" />
     <Content Include="Views\Account\ForgotPassword.cshtml" />
     <Content Include="Views\Account\ResetPassword.cshtml" />
+    <Content Include="Views\Employees\TaskEntry.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Datatable\" />
-    <Folder Include="Views\ExportExcel\" />
-    <Folder Include="Views\Task\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

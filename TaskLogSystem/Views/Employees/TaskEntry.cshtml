@@ -1,0 +1,281 @@
+﻿@{
+    ViewBag.Title = "TaskEntry";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using TaskLogSystem.Models
+
+@{
+    TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+
+    Employee user = null;
+    if (Session["CurrentUser"] != null)
+    {
+        user = (Employee)Session["CurrentUser"];
+    }
+}
+
+@{Html.RenderPartial("_Header"); }
+
+<div class="container-fluid">
+    <div class="text-center">
+        <h1><b>Task Log Entry</b></h1>
+    </div>
+
+    <button type="button"
+            class="btn btn-primary btn-lg addTaskBtn float-end mx-5"
+            data-bs-toggle="modal"
+            data-bs-target="#modalId">
+        Add Task
+    </button>
+
+    <table class="table table-bordered table-responsive" width="100%" id="TaskTable">
+        <thead>
+            <tr>
+                <th>Task Name</th>
+                <th>Task Description</th>
+                <th>Task Date</th>
+                <th>Approver</th>
+                <th>Approved or Rejected By</th>
+                <th>Approved or Rejected On</th>
+                <th>Status</th>
+                <th>Created On</th>
+                <th>Modified On</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+    </table>
+
+    <div class="modal fade"
+         id="modalId"
+         tabindex="-1"
+         data-bs-backdrop="static"
+         data-bs-keyboard="false"
+         role="dialog"
+         aria-labelledby="modalTitleId"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-md"
+             role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="taskDetails">Task Details</h3>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @{Html.RenderPartial("_TaskLogForm", new TaskLogSystem.Models.Task());}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let EmployeeID = @(user.EmployeeID);
+
+        // Task table for employees and manager
+        var TaskTable = $("#TaskTable").DataTable({
+            //"processing": true,
+            "serverSide": true,
+            "filter": true,
+            "orderMulti": false,
+            "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
+            "pagingType": "simple_numbers",
+            "order": [8, "desc"],
+
+            "columnDefs": [
+                {
+                    "targets": [9],
+                    "orderable": false
+                },
+                {
+                    "targets": [0, 2, 3, 4, 5, 6, 7, 8, 9],
+                    "width": "160px",
+                },
+            ],
+
+            "language": {
+                "loadingRecords": "Loading data, please wait...",
+                "zeroRecords": "No data available",
+                paginate: {
+                    next: '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+                    previous: '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
+                }
+            },
+
+            "ajax": {
+                "url": "/Datatable/LoadEmployeeTaskData",
+                "data": { EmployeeID },
+                "type": "POST",
+                "datatype": "json"
+            },
+
+            "columns": [
+                {
+                    "data": "TaskName",
+                    "name": "TaskName",
+                },
+                {
+                    "data": "TaskDescription",
+                    "name": "TaskDescription",
+                },
+                {
+                    "data": "TaskDate",
+                    "name": "TaskDate",
+                },
+                {
+                    "data": "ApproverName",
+                    "name": "ApproverName",
+                },
+                {
+                    "data": "ApprovedorRejectedByName",
+                    "name": "ApprovedorRejectedByName",
+                },
+                {
+                    "data": "ApprovedorRejectedOn",
+                    "name": "ApprovedorRejectedOn",
+                },
+                {
+                    "data": "Status",
+                    "name": "Status",
+                    "render": function (data, type, row) {
+                        if (type === 'display' || type === 'filter') {
+                            var className = '';
+                            if (data === 'Approved') {
+                                className = 'bg-success text-white p-2 w-100 text-center rounded';
+                            } else if (data === 'Rejected') {
+                                className = 'bg-danger text-white p-2 w-100 text-center rounded';
+                            } else if (data === 'Pending') {
+                                className = 'bg-warning text-black p-2 w-100 text-center rounded';
+                            }
+                            return '<div class="d-flex justify-content-center "><span class="' + className + '">' + data + '</span></div>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "data": "CreatedOn",
+                    "name": "CreatedOn",
+                },
+                {
+                    "data": "ModifiedOn",
+                    "name": "ModifiedOn",
+                },
+                {
+                    "data": null,
+                    "render": function (data, type, row) {
+                        if (row.Status == "Pending") {
+                            return '<td>' +
+                                '<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;"><button type="button" class="btn btn-primary editTaskBtn" data-id="' + row.TaskID + '" data-bs-toggle="modal" data-bs-target="#modalId">Edit</button>' +
+                                '<button type="button" class="btn btn-danger deleteTaskBtn" data-id="' + row.TaskID + '">Delete</button></div>' +
+                                '</td>';
+                        } else {
+                            return '<td>This Task is ' + row.Status + '</td>';
+                        }
+                    }
+                },
+            ]
+        });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Task Form Reset
+        $(document).on("click", ".addTaskBtn", function () {
+            var url = "/Task/Create";
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching Task details.");
+                }
+            });
+        });
+
+        // Edit Task
+        $(document).on("click", ".editTaskBtn", function () {
+            var taskID = $(this).data("id");
+            var url = "/Task/Edit/" + taskID;
+
+            $.ajax({
+                url: url,
+                type: "GET",
+                success: function (data) {
+                    $("#modalId .modal-body").html(data);
+                },
+                error: function () {
+                    console.error("An error occurred while fetching Task details.");
+                }
+            });
+        });
+
+        // Delete Task (SweetAlert Popup)
+        $(document).on("click", ".deleteTaskBtn", function () {
+            var taskID = $(this).data("id");
+            var url = "/Task/Delete/" + taskID;
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Yes, delete it!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        datatype: 'json',
+                        data: { id: taskID },
+                        success: function (data) {
+                            Swal.fire({
+                                title: "Deleted!",
+                                text: "Task has been deleted.",
+                                icon: "success"
+                            }).then((result) => {
+                                TaskTable.ajax.url("/Datatable/LoadTasksData").load();
+                            });
+                        },
+                        error: function () {
+                            console.error("An error occurred while deleting Task details.");
+                        }
+                    });
+                }
+            });
+        });
+
+        // Submit Task Form
+        $(document).on("submit", "#TaskLogForm", function (e) {
+            e.preventDefault();
+
+            var formData = new FormData(this);
+            var url = "/Task/UpsertTask";
+
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    if (response.success) {
+                        TaskTable.ajax.url("/Datatable/LoadEmployeeTaskData").load();
+                        $("#modalId").modal('hide');
+                    } else {
+                        $("#modalId .modal-body").html(response);
+                    }
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.error("An error occurred while creating Task.");
+                }
+            });
+        });
+    </script>
+}

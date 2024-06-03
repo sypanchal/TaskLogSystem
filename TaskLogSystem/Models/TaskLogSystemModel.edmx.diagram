@@ -4,15 +4,23 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="d066ea7922cd424881672a84d2332a7a" Name="Diagram1">
-        <EntityTypeShape EntityType="TaskLogSystemModel.Department" Width="1.5" PointX="0.75" PointY="2.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="TaskLogSystemModel.Employee" Width="1.5" PointX="3" PointY="1" IsExpanded="true" />
-        <AssociationConnector Association="TaskLogSystemModel.FK__Employee__Depart__398D8EEE" ManuallyRouted="false" />
-        <AssociationConnector Association="TaskLogSystemModel.FK__Employee__Report__3A81B327" ManuallyRouted="false" />
-        <EntityTypeShape EntityType="TaskLogSystemModel.Task" Width="1.5" PointX="5.25" PointY="1.375" />
-        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__Approvedo__47DBAE45" />
-        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__ApproverI__46E78A0C" />
-        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__EmployeeI__45F365D3" />
+      <Diagram DiagramId="05b152c781454292aa6cedc6368c7c1b" Name="Diagram1">
+        <EntityTypeShape EntityType="TaskLogSystemModel.Access" Width="1.5" PointX="0.75" PointY="2.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.Employee" Width="1.5" PointX="3" PointY="3.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.MenuRoleAccess" Width="1.5" PointX="5.25" PointY="0.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.Menu" Width="1.5" PointX="3" PointY="9.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.RoleAccess" Width="1.5" PointX="3" PointY="0.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.Role" Width="1.5" PointX="0.75" PointY="5" IsExpanded="true" />
+        <EntityTypeShape EntityType="TaskLogSystemModel.Task" Width="1.5" PointX="5.25" PointY="4" IsExpanded="true" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__RoleAcces__Acces__7E37BEF6" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Employees__Repor__6477ECF3" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Employees__RoleI__6383C8BA" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__Approvedo__6B24EA82" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__ApproverI__6A30C649" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__Tasks__EmployeeI__693CA210" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__MenuRoleA__MenuI__01142BA1" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__MenuRoleA__RoleA__02084FDA" ManuallyRouted="false" />
+        <AssociationConnector Association="TaskLogSystemModel.FK__RoleAcces__RoleI__7D439ABD" ManuallyRouted="false" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

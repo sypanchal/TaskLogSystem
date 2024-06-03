@@ -1,15 +1,22 @@
 ﻿@using TaskLogSystem.Models
+
 @{
     ViewBag.Title = "ApproveTasks";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @{
+    TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+
     Employee user = null;
+
     if (Session["CurrentUser"] != null)
     {
         user = (Employee)Session["CurrentUser"];
     }
+
+    // Get a list of permissions, which has assigned to user for this Menu
+    var permissionsList = _dbContext.GetUserPermissionsForMenu(user.EmployeeID, "Approve Tasks").ToList();
 }
 
 @{Html.RenderPartial("_Header"); }
@@ -19,77 +26,48 @@
         <h1><b>Approve Tasks</b></h1>
     </div>
 
-    @*<div class="StatusDropdown">
-        <select id="Status" name="Status" class="form-select">
-            <option value="" selected>Select</option>
-            <option value="Approved">Approved</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Pending">Pending</option>
-        </select>
-    </div>*@
-
-    <table class="table table-bordered table-responsive" id="ApproveTaskTable">
-        <thead>
-            <tr>
-                <th>
-                    Employee Code
-                </th>
-                <th>
-                    Employee Name
-                </th>
-                <th>
-                    Task Name
-                </th>
-                <th>
-                    Task Description
-                </th>
-                <th>
-                    Task Date
-                </th>
-                <th>
-                    Approver
-                </th>
-                <th>
-                    Approved or Rejected By
-                </th>
-                <th>
-                    Approved or Rejected On
-                </th>
-                <th>
-                    Status
-                </th>
-                <th>
-                    Created On
-                </th>
-                <th>
-                    Modified On
-                </th>
-                <th>
-                    Actions
-                </th>
-            </tr>
-        </thead>
-    </table>
+    @*Check if user has access to view employee's Task list*@
+    @if (permissionsList.Contains("Read"))
+    {
+        <table class="table table-bordered table-responsive" style="width: 100%;" id="ApproveTaskTable">
+            <thead>
+                <tr>
+                    <th>Employee Code</th>
+                    <th>Employee Name</th>
+                    <th>Task Name</th>
+                    <th>Task Description</th>
+                    <th>Task Date</th>
+                    <th>Approver</th>
+                    <th>Approved or Rejected By</th>
+                    <th>Approved or Rejected On</th>
+                    <th>Status</th>
+                    <th>Created On</th>
+                    <th>Modified On</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    }
 </div>
 
 @section scripts {
     <script>
         var ApproveTaskTable = $("#ApproveTaskTable").DataTable({
-            "processing": true,
+            //"processing": true,
             "serverSide": true,
             "filter": true,
             "searching": true,
             "orderMulti": false,
             "lengthMenu": [[5, 10, 20, 50, -1], [5, 10, 20, 50, "All"]],
-
             "order": [10, "desc"],
             "pagingType": "simple_numbers",
+
             "language": {
                 "loadingRecords": "Loading data, please wait...",
                 "zeroRecords": "No data available",
-                paginate: {
-                    next: '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
-                    previous: '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
+                "paginate": {
+                    "next": '<i class="fa fa-chevron-right" aria-hidden="true"></i>',
+                    "previous": '<i class="fa fa-chevron-left" aria-hidden="true"></i>'
                 }
             },
 
@@ -129,7 +107,7 @@
                             buttons: [
                                 {
                                     extend: 'excelHtml5',
-                                    text: '<i class="fa fa-print"></i> Print',
+                                    text: '<i class="fa fa-file-excel-o"></i> Excel',
                                     title: 'Task Approve/Reject Status',
                                     exportOptions: {
                                         columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -161,47 +139,38 @@
                 {
                     "data": "EmployeeCode",
                     "name": "EmployeeCode",
-                    "title": "Employee Code",
                 },
                 {
                     "data": "EmployeeName",
                     "name": "EmployeeName",
-                    "title": "Employee Name",
                 },
                 {
                     "data": "TaskName",
                     "name": "TaskName",
-                    "title": "Task Name",
                 },
                 {
                     "data": "TaskDescription",
                     "name": "TaskDescription",
-                    "title": "Task Description",
                 },
                 {
                     "data": "TaskDate",
                     "name": "TaskDate",
-                    "title": "Task Date",
                 },
                 {
                     "data": "ApproverName",
                     "name": "ApproverName",
-                    "title": "Approver",
                 },
                 {
                     "data": "ApprovedorRejectedByName",
                     "name": "ApprovedorRejectedByName",
-                    "title": "Approved or Rejected By",
                 },
                 {
                     "data": "ApprovedorRejectedOn",
                     "name": "ApprovedorRejectedOn",
-                    "title": "Approved or Rejected On",
                 },
                 {
                     "data": "Status",
                     "name": "Status",
-                    "title": "Status",
                     "render": function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
                             var className = '';
@@ -220,28 +189,34 @@
                 {
                     "data": "CreatedOn",
                     "name": "CreatedOn",
-                    "title": "Created On",
                 },
                 {
                     "data": "ModifiedOn",
                     "name": "ModifiedOn",
-                    "title": "Modified On",
                 },
+
+                @if (permissionsList.Contains("Approve") || permissionsList.Contains("Reject"))
                 {
-                    "data": null,
-                    "title": "Actions",
-                    "render": function (data, type, row) {
-                        if ((row.Status == "Pending" && @user.DepartmentID == 2) || @user.DepartmentID == 1) {
-                            return '<td>' +
-                                '<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;"><button type="button" class="btn btn-success approveBtn" data-id="' + row.TaskID + '">Approve</button>' +
-                                '<button type="button" class="btn btn-danger rejectBtn" data-id="' + row.TaskID + '">Reject</button></div>' +
-                                '</td>';
-                        } else {
-                            return '<td>No Action is Required</td>';
+                    <text>
+                        {
+                            "data": null,
+                            "render": function (data, type, row) {
+                                if ((row.Status === "Pending" && @user.RoleID != 1) || @user.RoleID == 1) {
+                                    var approveDisabled = row.Status === "Approved" ? "disabled" : "";
+                                    var rejectDisabled = row.Status === "Rejected" ? "disabled" : "";
+
+                                    return `<div class="d-flex justify-content-center align-items-center" style="gap: 1rem;">
+                                                <button type="button" class="btn btn-success approveBtn" data-id="${row.TaskID}" ${approveDisabled}>Approve</button>
+                                                <button type="button" class="btn btn-danger rejectBtn" data-id="${row.TaskID}" ${rejectDisabled}>Reject</button>
+                                            </div>`;
+                                } else {
+                                    return 'No Action is Required';
+                                }
+                            }
                         }
-                    }
-                },
-            ]
+                    </text>
+                }
+            ],
         });
 
         // Approve Task

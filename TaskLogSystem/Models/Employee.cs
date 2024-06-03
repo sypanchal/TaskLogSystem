@@ -17,7 +17,7 @@ namespace TaskLogSystem.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public Employee()
         {
-            this.Employee1 = new HashSet<Employee>();
+            this.Employees1 = new HashSet<Employee>();
             this.Tasks = new HashSet<Task>();
             this.Tasks1 = new HashSet<Task>();
             this.Tasks2 = new HashSet<Task>();
@@ -32,14 +32,14 @@ namespace TaskLogSystem.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public string MobileNumber { get; set; }
-        public int DepartmentID { get; set; }
+        public int RoleID { get; set; }
         public Nullable<int> ReportingPerson { get; set; }
         public bool IsDeleted { get; set; }
     
-        public virtual Department Department { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Employee> Employee1 { get; set; }
-        public virtual Employee Employee2 { get; set; }
+        public virtual ICollection<Employee> Employees1 { get; set; }
+        public virtual Employee Employee1 { get; set; }
+        public virtual Role Role { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Task> Tasks { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

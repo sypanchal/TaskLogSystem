@@ -1,32 +1,80 @@
-﻿@using TaskLogSystem.Models
+﻿@using TaskLogSystem.CustomModels
+@model Dictionary<int?, List<UserMenuPermission>>
 
+@using TaskLogSystem.Models
 @{
+    TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
+
     Employee user = null;
     if (Session["CurrentUser"] != null)
     {
         user = (Employee)Session["CurrentUser"];
     }
-}
-<div class="navbar">
-    <div class="nav-logo">
-        <a href="/"><b>TaskLog</b>System</a>
-    </div>
-    <div class="nav-items">
-        <ul>
-            @if (user.DepartmentID == 2)
-            {
-                <li><a href="/Employees/ViewEmployees/@user.EmployeeID"> View Employees </a></li>
-            }
-            @if (user.DepartmentID != 3)
-            {
-                <li><a href="/Employees/ApproveTasks"> Approve Tasks </a></li>
-            }
-            <li><a href="/Employees/Settings/@user.EmployeeID"> Profile </a></li>
-            <li><a href="/Account/Logout"> Logout </a></li>
 
-            <span class="text-light" style="cursor: default;">
-                Welcome, @user.FirstName!
-            </span>
+    var menuTree = Model;
+}
+
+<!-- Sidebar -->
+<aside id="sidebar">
+    <div class="h-100">
+        <div class="sidebar-logo">
+            <a href="/"><b>TaskLog</b>System</a>
+        </div>
+
+        <!-- Sidebar Navigation -->
+        <ul class="sidebar-nav">
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="/">
+                    <i class="fa-solid fa-sliders pe-2"></i>
+                    Dashboard
+                </a>
+            </li>
+
+            @if (menuTree.ContainsKey(0))
+            {
+                foreach (var menu in menuTree[0])
+                {
+                    if (menu.AccessName == "Read")
+                    {
+                        <li class="sidebar-item">
+                            <a class="sidebar-link collapsed" data-bs-toggle="collapse" data-bs-target="#@menu.MenuName.ToLower().Replace(" ", "_")"
+                               aria-expanded="false" aria-controls="@menu.MenuName.ToLower().Replace(" ", "_")">
+                                <i class="@menu.IconName pe-2"></i>
+                                @menu.MenuName
+                            </a>
+
+                            @if (menuTree.ContainsKey(menu.MenuID))
+                            {
+                                <ul id="@menu.MenuName.ToLower().Replace(" ", "_")" class="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                    @foreach (var child in menuTree[menu.MenuID])
+                                    {
+                                        if (child.AccessName == "Read")
+                                        {
+                                            <li class="sidebar-item ps-4">
+                                                <a href="/@menu.MenuName.Replace(" ", "")/@child.MenuName.Replace(" ", "")" class="sidebar-link">@child.MenuName</a>
+                                            </li>
+                                        }
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                }
+            }
+
+            <li class="sidebar-item">
+                <a href="/Employees/Settings/@user.EmployeeID" class="sidebar-link">
+                    <i class="fa-solid fa-user pe-2"></i>
+                    Profile
+                </a>
+            </li>
+
+            <li class="sidebar-item">
+                <a class="sidebar-link" href="/Account/Logout">
+                    <i class="fa-solid fa-arrow-right-from-bracket pe-2"></i>
+                    Logout
+                </a>
+            </li>
         </ul>
     </div>
-</div>
+</aside>

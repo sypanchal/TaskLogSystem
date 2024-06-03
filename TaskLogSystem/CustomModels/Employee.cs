@@ -40,7 +40,7 @@ namespace TaskLogSystem.Models
             [Required]
             public string MobileNumber { get; set; }
 
-            public int DepartmentID { get; set; }
+            public int RoleID { get; set; }
 
             public int ReportingPerson { get; set; }
 

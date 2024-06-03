@@ -12,6 +12,8 @@ namespace TaskLogSystem.Models
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class TaskLogSystemEntities : DbContext
     {
@@ -25,8 +27,34 @@ namespace TaskLogSystem.Models
             throw new UnintentionalCodeFirstException();
         }
     
-        public virtual DbSet<Department> Departments { get; set; }
+        public virtual DbSet<Access> Accesses { get; set; }
         public virtual DbSet<Employee> Employees { get; set; }
+        public virtual DbSet<MenuRoleAccess> MenuRoleAccesses { get; set; }
+        public virtual DbSet<Menu> Menus { get; set; }
+        public virtual DbSet<RoleAccess> RoleAccesses { get; set; }
+        public virtual DbSet<Role> Roles { get; set; }
         public virtual DbSet<Task> Tasks { get; set; }
+    
+        public virtual ObjectResult<GetAccessibleMenus_Result> GetAccessibleMenus(Nullable<int> employeeID)
+        {
+            var employeeIDParameter = employeeID.HasValue ?
+                new ObjectParameter("EmployeeID", employeeID) :
+                new ObjectParameter("EmployeeID", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAccessibleMenus_Result>("GetAccessibleMenus", employeeIDParameter);
+        }
+    
+        public virtual ObjectResult<string> GetUserPermissionsForMenu(Nullable<int> employeeID, string menuName)
+        {
+            var employeeIDParameter = employeeID.HasValue ?
+                new ObjectParameter("EmployeeID", employeeID) :
+                new ObjectParameter("EmployeeID", typeof(int));
+    
+            var menuNameParameter = menuName != null ?
+                new ObjectParameter("MenuName", menuName) :
+                new ObjectParameter("MenuName", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<string>("GetUserPermissionsForMenu", employeeIDParameter, menuNameParameter);
+        }
     }
 }

@@ -4,7 +4,6 @@
 
 @{
     TaskLogSystemEntities _dbContext = new TaskLogSystemEntities();
-
 }
 
 @using (Html.BeginForm(Model.EmployeeID == 0 ? "CreateEmployee" : "UpdateEmployee", "Employees", FormMethod.Post, new
@@ -34,7 +33,6 @@
         else
         {
             <input type="text" class="form-control mw-100" id="EmployeeID" name="EmployeeID" value="@Model.EmployeeID" hidden readonly style="cursor: no-drop;">
-
         }
 
         <div class="col-6 mb-2">
@@ -74,13 +72,13 @@
 
         <div class="col-3 mb-2">
             <div class="form-group">
-                <label class="form-label text-bold" for="DepartmentID">Department</label>
-                <select class="form-select" id="DepartmentID" name="DepartmentID">
+                <label class="form-label text-bold" for="RoleID">Role</label>
+                <select class="form-select" id="RoleID" name="RoleID">
                     @{
-                        var departments = new SelectList(_dbContext.Departments, "DepartmentID", "DepartmentName");
-                        foreach (var d in departments)
+                        var roles = new SelectList(_dbContext.Roles, "RoleID", "RoleName");
+                        foreach (var d in roles)
                         {
-                            <option value="@d.Value" @(Convert.ToInt32(d.Value) == Model.DepartmentID ? "selected" : "") @(Model.DepartmentID == 0 && Convert.ToInt32(d.Value) == 3 ? "selected" : "" )>@d.Text</option>
+                            <option value="@d.Value" @(Convert.ToInt32(d.Value) == Model.RoleID ? "selected" : "") @(Model.RoleID == 0 && Convert.ToInt32(d.Value) == 3 ? "selected" : "" )>@d.Text</option>
                         }
                     }
                 </select>
@@ -93,7 +91,8 @@
                 <select class="form-select" id="ReportingPerson" name="ReportingPerson">
                     @{
 
-                        var reportingPersons = Model.EmployeeID == 0 ? new SelectList(_dbContext.Employees.Where(e => e.DepartmentID < 3 && !e.IsDeleted), "EmployeeID", "FirstName") : new SelectList(_dbContext.Employees.Where(e => (e.DepartmentID < Model.DepartmentID || e.EmployeeID == Model.ReportingPerson) && !e.IsDeleted), "EmployeeID", "FirstName");
+                        var reportingPersons = Model.EmployeeID == 0 ? new SelectList(_dbContext.Employees.Where(e => e.RoleID < 3 && !e.IsDeleted), "EmployeeID", "FirstName") : new SelectList(_dbContext.Employees.Where(e => (e.RoleID < Model.RoleID || e.EmployeeID == Model.ReportingPerson) && !e.IsDeleted), "EmployeeID", "FirstName");
+                        
                         foreach (var d in reportingPersons)
                         {
                             <option value="@d.Value" @(Convert.ToInt32(d.Value) == Model.ReportingPerson ? "selected" : "")>@d.Text</option>
@@ -148,7 +147,6 @@
             else
             {
                 <button type="submit" name="submit" class="btn btn-primary btn-block btn-flat form-control">Update Employee</button>
-
             }
         </div>
     </div>

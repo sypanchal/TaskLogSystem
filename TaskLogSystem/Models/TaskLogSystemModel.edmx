@@ -5,19 +5,19 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="TaskLogSystemModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Department">
+        <EntityType Name="Access">
           <Key>
-            <PropertyRef Name="DepartmentID" />
+            <PropertyRef Name="AccessID" />
           </Key>
-          <Property Name="DepartmentID" Type="int" Nullable="false" />
-          <Property Name="DepartmentName" Type="varchar" MaxLength="10" Nullable="false" />
+          <Property Name="AccessID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="AccessName" Type="varchar" MaxLength="50" Nullable="false" />
         </EntityType>
-        <EntityType Name="Employee">
+        <EntityType Name="Employees">
           <Key>
             <PropertyRef Name="EmployeeID" />
           </Key>
           <Property Name="EmployeeID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="EmployeeCode" Type="nvarchar" MaxLength="15" StoreGeneratedPattern="Computed" />
+          <Property Name="EmployeeCode" Type="nvarchar" MaxLength="16" StoreGeneratedPattern="Computed" />
           <Property Name="FirstName" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="LastName" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="DateOfBirth" Type="date" Nullable="false" />
@@ -25,9 +25,39 @@
           <Property Name="Email" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="Password" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="MobileNumber" Type="varchar" MaxLength="15" Nullable="false" />
-          <Property Name="DepartmentID" Type="int" Nullable="false" />
+          <Property Name="RoleID" Type="int" Nullable="false" />
           <Property Name="ReportingPerson" Type="int" />
           <Property Name="IsDeleted" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="MenuRoleAccess">
+          <Key>
+            <PropertyRef Name="MenuRoleAccessID" />
+          </Key>
+          <Property Name="MenuRoleAccessID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MenuID" Type="int" Nullable="false" />
+          <Property Name="RoleAccessID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Menus">
+          <Key>
+            <PropertyRef Name="MenuID" />
+          </Key>
+          <Property Name="MenuID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="MenuName" Type="varchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="RoleAccess">
+          <Key>
+            <PropertyRef Name="RoleAccessID" />
+          </Key>
+          <Property Name="RoleAccessID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="RoleID" Type="int" Nullable="false" />
+          <Property Name="AccessID" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Roles">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="int" Nullable="false" />
+          <Property Name="RoleName" Type="varchar" MaxLength="10" Nullable="false" />
         </EntityType>
         <EntityType Name="Tasks">
           <Key>
@@ -46,35 +76,83 @@
           <Property Name="ModifiedOn" Type="datetime" />
           <Property Name="IsDeleted" Type="bit" Nullable="false" />
         </EntityType>
-        <Association Name="FK__Employee__Depart__398D8EEE">
-          <End Role="Department" Type="Self.Department" Multiplicity="1" />
-          <End Role="Employee" Type="Self.Employee" Multiplicity="*" />
+        <Association Name="FK__Employees__Repor__0A9D95DB">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+          <End Role="Employees1" Type="Self.Employees" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Department">
-              <PropertyRef Name="DepartmentID" />
-            </Principal>
-            <Dependent Role="Employee">
-              <PropertyRef Name="DepartmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Employee__Report__3A81B327">
-          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
-          <End Role="Employee1" Type="Self.Employee" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Employee">
+            <Principal Role="Employees">
               <PropertyRef Name="EmployeeID" />
             </Principal>
-            <Dependent Role="Employee1">
+            <Dependent Role="Employees1">
               <PropertyRef Name="ReportingPerson" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Tasks__Approvedo__47DBAE45">
-          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+        <Association Name="FK__Employees__RoleI__09A971A2">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="Employees" Type="Self.Employees" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="Employees">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__MenuRoleA__MenuI__1CBC4616">
+          <End Role="Menus" Type="Self.Menus" Multiplicity="1" />
+          <End Role="MenuRoleAccess" Type="Self.MenuRoleAccess" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Menus">
+              <PropertyRef Name="MenuID" />
+            </Principal>
+            <Dependent Role="MenuRoleAccess">
+              <PropertyRef Name="MenuID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__MenuRoleA__RoleA__1DB06A4F">
+          <End Role="RoleAccess" Type="Self.RoleAccess" Multiplicity="1" />
+          <End Role="MenuRoleAccess" Type="Self.MenuRoleAccess" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RoleAccess">
+              <PropertyRef Name="RoleAccessID" />
+            </Principal>
+            <Dependent Role="MenuRoleAccess">
+              <PropertyRef Name="RoleAccessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__RoleAcces__Acces__7E37BEF6">
+          <End Role="Access" Type="Self.Access" Multiplicity="1" />
+          <End Role="RoleAccess" Type="Self.RoleAccess" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Access">
+              <PropertyRef Name="AccessID" />
+            </Principal>
+            <Dependent Role="RoleAccess">
+              <PropertyRef Name="AccessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__RoleAcces__RoleI__7D439ABD">
+          <End Role="Roles" Type="Self.Roles" Multiplicity="1" />
+          <End Role="RoleAccess" Type="Self.RoleAccess" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="RoleAccess">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Tasks__Approvedo__19DFD96B">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
           <End Role="Tasks" Type="Self.Tasks" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Employee">
+            <Principal Role="Employees">
               <PropertyRef Name="EmployeeID" />
             </Principal>
             <Dependent Role="Tasks">
@@ -82,11 +160,11 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Tasks__ApproverI__46E78A0C">
-          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+        <Association Name="FK__Tasks__ApproverI__18EBB532">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
           <End Role="Tasks" Type="Self.Tasks" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Employee">
+            <Principal Role="Employees">
               <PropertyRef Name="EmployeeID" />
             </Principal>
             <Dependent Role="Tasks">
@@ -94,11 +172,11 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Tasks__EmployeeI__45F365D3">
-          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
+        <Association Name="FK__Tasks__EmployeeI__17F790F9">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
           <End Role="Tasks" Type="Self.Tasks" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Employee">
+            <Principal Role="Employees">
               <PropertyRef Name="EmployeeID" />
             </Principal>
             <Dependent Role="Tasks">
@@ -106,28 +184,55 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Function Name="GetAccessibleMenus" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="EmployeeID" Type="int" Mode="In" />
+        </Function>
+        <Function Name="GetUserPermissionsForMenu" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="EmployeeID" Type="int" Mode="In" />
+          <Parameter Name="MenuName" Type="varchar" Mode="In" />
+        </Function>
         <EntityContainer Name="TaskLogSystemModelStoreContainer">
-          <EntitySet Name="Department" EntityType="Self.Department" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Employee" EntityType="Self.Employee" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Access" EntityType="Self.Access" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Employees" EntityType="Self.Employees" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="MenuRoleAccess" EntityType="Self.MenuRoleAccess" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Menus" EntityType="Self.Menus" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RoleAccess" EntityType="Self.RoleAccess" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Roles" EntityType="Self.Roles" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Tasks" EntityType="Self.Tasks" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK__Employee__Depart__398D8EEE" Association="Self.FK__Employee__Depart__398D8EEE">
-            <End Role="Department" EntitySet="Department" />
-            <End Role="Employee" EntitySet="Employee" />
+          <AssociationSet Name="FK__Employees__Repor__0A9D95DB" Association="Self.FK__Employees__Repor__0A9D95DB">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Employees1" EntitySet="Employees" />
           </AssociationSet>
-          <AssociationSet Name="FK__Employee__Report__3A81B327" Association="Self.FK__Employee__Report__3A81B327">
-            <End Role="Employee" EntitySet="Employee" />
-            <End Role="Employee1" EntitySet="Employee" />
+          <AssociationSet Name="FK__Employees__RoleI__09A971A2" Association="Self.FK__Employees__RoleI__09A971A2">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Employees" EntitySet="Employees" />
           </AssociationSet>
-          <AssociationSet Name="FK__Tasks__Approvedo__47DBAE45" Association="Self.FK__Tasks__Approvedo__47DBAE45">
-            <End Role="Employee" EntitySet="Employee" />
+          <AssociationSet Name="FK__MenuRoleA__MenuI__1CBC4616" Association="Self.FK__MenuRoleA__MenuI__1CBC4616">
+            <End Role="Menus" EntitySet="Menus" />
+            <End Role="MenuRoleAccess" EntitySet="MenuRoleAccess" />
+          </AssociationSet>
+          <AssociationSet Name="FK__MenuRoleA__RoleA__1DB06A4F" Association="Self.FK__MenuRoleA__RoleA__1DB06A4F">
+            <End Role="RoleAccess" EntitySet="RoleAccess" />
+            <End Role="MenuRoleAccess" EntitySet="MenuRoleAccess" />
+          </AssociationSet>
+          <AssociationSet Name="FK__RoleAcces__Acces__7E37BEF6" Association="Self.FK__RoleAcces__Acces__7E37BEF6">
+            <End Role="Access" EntitySet="Access" />
+            <End Role="RoleAccess" EntitySet="RoleAccess" />
+          </AssociationSet>
+          <AssociationSet Name="FK__RoleAcces__RoleI__7D439ABD" Association="Self.FK__RoleAcces__RoleI__7D439ABD">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RoleAccess" EntitySet="RoleAccess" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Tasks__Approvedo__19DFD96B" Association="Self.FK__Tasks__Approvedo__19DFD96B">
+            <End Role="Employees" EntitySet="Employees" />
             <End Role="Tasks" EntitySet="Tasks" />
           </AssociationSet>
-          <AssociationSet Name="FK__Tasks__ApproverI__46E78A0C" Association="Self.FK__Tasks__ApproverI__46E78A0C">
-            <End Role="Employee" EntitySet="Employee" />
+          <AssociationSet Name="FK__Tasks__ApproverI__18EBB532" Association="Self.FK__Tasks__ApproverI__18EBB532">
+            <End Role="Employees" EntitySet="Employees" />
             <End Role="Tasks" EntitySet="Tasks" />
           </AssociationSet>
-          <AssociationSet Name="FK__Tasks__EmployeeI__45F365D3" Association="Self.FK__Tasks__EmployeeI__45F365D3">
-            <End Role="Employee" EntitySet="Employee" />
+          <AssociationSet Name="FK__Tasks__EmployeeI__17F790F9" Association="Self.FK__Tasks__EmployeeI__17F790F9">
+            <End Role="Employees" EntitySet="Employees" />
             <End Role="Tasks" EntitySet="Tasks" />
           </AssociationSet>
         </EntityContainer>
@@ -135,20 +240,20 @@
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="TaskLogSystemModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
-        <EntityType Name="Department">
+        <EntityType Name="Access">
           <Key>
-            <PropertyRef Name="DepartmentID" />
+            <PropertyRef Name="AccessID" />
           </Key>
-          <Property Name="DepartmentID" Type="Int32" Nullable="false" />
-          <Property Name="DepartmentName" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
-          <NavigationProperty Name="Employees" Relationship="Self.FK__Employee__Depart__398D8EEE" FromRole="Department" ToRole="Employee" />
+          <Property Name="AccessID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="AccessName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="RoleAccesses" Relationship="Self.FK__RoleAcces__Acces__7E37BEF6" FromRole="Access" ToRole="RoleAccess" />
         </EntityType>
         <EntityType Name="Employee">
           <Key>
             <PropertyRef Name="EmployeeID" />
           </Key>
           <Property Name="EmployeeID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <Property Name="EmployeeCode" Type="String" MaxLength="15" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
+          <Property Name="EmployeeCode" Type="String" MaxLength="16" FixedLength="false" Unicode="true" annotation:StoreGeneratedPattern="Computed" />
           <Property Name="FirstName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="LastName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="DateOfBirth" Type="DateTime" Nullable="false" Precision="0" />
@@ -156,72 +261,61 @@
           <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Password" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="MobileNumber" Type="String" MaxLength="15" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="DepartmentID" Type="Int32" Nullable="false" />
+          <Property Name="RoleID" Type="Int32" Nullable="false" />
           <Property Name="ReportingPerson" Type="Int32" />
-          <NavigationProperty Name="Department" Relationship="Self.FK__Employee__Depart__398D8EEE" FromRole="Employee" ToRole="Department" />
-          <NavigationProperty Name="Employee1" Relationship="Self.FK__Employee__Report__3A81B327" FromRole="Employee" ToRole="Employee1" />
-          <NavigationProperty Name="Employee2" Relationship="Self.FK__Employee__Report__3A81B327" FromRole="Employee1" ToRole="Employee" />
+          <NavigationProperty Name="Employees1" Relationship="Self.FK__Employees__Repor__6477ECF3" FromRole="Employees" ToRole="Employees1" />
+          <NavigationProperty Name="Employee1" Relationship="Self.FK__Employees__Repor__6477ECF3" FromRole="Employees1" ToRole="Employees" />
+          <NavigationProperty Name="Role" Relationship="Self.FK__Employees__RoleI__6383C8BA" FromRole="Employees" ToRole="Roles" />
+          <NavigationProperty Name="Tasks" Relationship="Self.FK__Tasks__Approvedo__6B24EA82" FromRole="Employees" ToRole="Tasks" />
+          <NavigationProperty Name="Tasks1" Relationship="Self.FK__Tasks__ApproverI__6A30C649" FromRole="Employees" ToRole="Tasks" />
+          <NavigationProperty Name="Tasks2" Relationship="Self.FK__Tasks__EmployeeI__693CA210" FromRole="Employees" ToRole="Tasks" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Tasks" Relationship="TaskLogSystemModel.FK__Tasks__Approvedo__47DBAE45" FromRole="Employee" ToRole="Task" />
-          <NavigationProperty Name="Tasks1" Relationship="TaskLogSystemModel.FK__Tasks__ApproverI__46E78A0C" FromRole="Employee" ToRole="Task" />
-          <NavigationProperty Name="Tasks2" Relationship="TaskLogSystemModel.FK__Tasks__EmployeeI__45F365D3" FromRole="Employee" ToRole="Task" />
         </EntityType>
-        <Association Name="FK__Employee__Depart__398D8EEE">
-          <End Role="Department" Type="Self.Department" Multiplicity="1" />
-          <End Role="Employee" Type="Self.Employee" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Department">
-              <PropertyRef Name="DepartmentID" />
-            </Principal>
-            <Dependent Role="Employee">
-              <PropertyRef Name="DepartmentID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK__Employee__Report__3A81B327">
-          <End Role="Employee" Type="Self.Employee" Multiplicity="0..1" />
-          <End Role="Employee1" Type="Self.Employee" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Employee">
-              <PropertyRef Name="EmployeeID" />
-            </Principal>
-            <Dependent Role="Employee1">
-              <PropertyRef Name="ReportingPerson" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityContainer Name="TaskLogSystemEntities" annotation:LazyLoadingEnabled="true">
-          <EntitySet Name="Departments" EntityType="Self.Department" />
-          <EntitySet Name="Employees" EntityType="Self.Employee" />
-          <AssociationSet Name="FK__Employee__Depart__398D8EEE" Association="Self.FK__Employee__Depart__398D8EEE">
-            <End Role="Department" EntitySet="Departments" />
-            <End Role="Employee" EntitySet="Employees" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Employee__Report__3A81B327" Association="Self.FK__Employee__Report__3A81B327">
-            <End Role="Employee" EntitySet="Employees" />
-            <End Role="Employee1" EntitySet="Employees" />
-          </AssociationSet>
-          <EntitySet Name="Tasks" EntityType="TaskLogSystemModel.Task" />
-          <AssociationSet Name="FK__Tasks__Approvedo__47DBAE45" Association="TaskLogSystemModel.FK__Tasks__Approvedo__47DBAE45">
-            <End Role="Employee" EntitySet="Employees" />
-            <End Role="Task" EntitySet="Tasks" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Tasks__ApproverI__46E78A0C" Association="TaskLogSystemModel.FK__Tasks__ApproverI__46E78A0C">
-            <End Role="Employee" EntitySet="Employees" />
-            <End Role="Task" EntitySet="Tasks" />
-          </AssociationSet>
-          <AssociationSet Name="FK__Tasks__EmployeeI__45F365D3" Association="TaskLogSystemModel.FK__Tasks__EmployeeI__45F365D3">
-            <End Role="Employee" EntitySet="Employees" />
-            <End Role="Task" EntitySet="Tasks" />
-          </AssociationSet>
-        </EntityContainer>
+        <EntityType Name="MenuRoleAccess">
+          <Key>
+            <PropertyRef Name="MenuRoleAccessID" />
+          </Key>
+          <Property Name="MenuRoleAccessID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MenuID" Type="Int32" Nullable="false" />
+          <Property Name="RoleAccessID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Menu" Relationship="Self.FK__MenuRoleA__MenuI__01142BA1" FromRole="MenuRoleAccess" ToRole="Menus" />
+          <NavigationProperty Name="RoleAccess" Relationship="Self.FK__MenuRoleA__RoleA__02084FDA" FromRole="MenuRoleAccess" ToRole="RoleAccess" />
+        </EntityType>
+        <EntityType Name="Menu">
+          <Key>
+            <PropertyRef Name="MenuID" />
+          </Key>
+          <Property Name="MenuID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="MenuName" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="MenuRoleAccesses" Relationship="Self.FK__MenuRoleA__MenuI__01142BA1" FromRole="Menus" ToRole="MenuRoleAccess" />
+        </EntityType>
+        <EntityType Name="RoleAccess">
+          <Key>
+            <PropertyRef Name="RoleAccessID" />
+          </Key>
+          <Property Name="RoleAccessID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="RoleID" Type="Int32" Nullable="false" />
+          <Property Name="AccessID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Access" Relationship="Self.FK__RoleAcces__Acces__7E37BEF6" FromRole="RoleAccess" ToRole="Access" />
+          <NavigationProperty Name="MenuRoleAccesses" Relationship="Self.FK__MenuRoleA__RoleA__02084FDA" FromRole="RoleAccess" ToRole="MenuRoleAccess" />
+          <NavigationProperty Name="Role" Relationship="Self.FK__RoleAcces__RoleI__7D439ABD" FromRole="RoleAccess" ToRole="Roles" />
+        </EntityType>
+        <EntityType Name="Role">
+          <Key>
+            <PropertyRef Name="RoleID" />
+          </Key>
+          <Property Name="RoleID" Type="Int32" Nullable="false" />
+          <Property Name="RoleName" Type="String" MaxLength="10" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK__Employees__RoleI__6383C8BA" FromRole="Roles" ToRole="Employees" />
+          <NavigationProperty Name="RoleAccesses" Relationship="Self.FK__RoleAcces__RoleI__7D439ABD" FromRole="Roles" ToRole="RoleAccess" />
+        </EntityType>
         <EntityType Name="Task">
           <Key>
             <PropertyRef Name="TaskID" />
           </Key>
           <Property Name="TaskID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="EmployeeID" Type="Int32" />
-          <Property Name="TaskName" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="TaskName" Type="String" MaxLength="255" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="TaskDescription" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="TaskDate" Type="DateTime" Precision="0" />
           <Property Name="ApproverID" Type="Int32" />
@@ -230,64 +324,192 @@
           <Property Name="Status" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="CreatedOn" Type="DateTime" Precision="3" />
           <Property Name="ModifiedOn" Type="DateTime" Precision="3" />
-          <NavigationProperty Name="Employee" Relationship="TaskLogSystemModel.FK__Tasks__Approvedo__47DBAE45" FromRole="Task" ToRole="Employee" />
-          <NavigationProperty Name="Employee1" Relationship="TaskLogSystemModel.FK__Tasks__ApproverI__46E78A0C" FromRole="Task" ToRole="Employee" />
-          <NavigationProperty Name="Employee2" Relationship="TaskLogSystemModel.FK__Tasks__EmployeeI__45F365D3" FromRole="Task" ToRole="Employee" />
+          <NavigationProperty Name="Employee" Relationship="Self.FK__Tasks__Approvedo__6B24EA82" FromRole="Tasks" ToRole="Employees" />
+          <NavigationProperty Name="Employee1" Relationship="Self.FK__Tasks__ApproverI__6A30C649" FromRole="Tasks" ToRole="Employees" />
+          <NavigationProperty Name="Employee2" Relationship="Self.FK__Tasks__EmployeeI__693CA210" FromRole="Tasks" ToRole="Employees" />
           <Property Name="IsDeleted" Type="Boolean" Nullable="false" />
         </EntityType>
-        <Association Name="FK__Tasks__Approvedo__47DBAE45">
-          <End Type="TaskLogSystemModel.Employee" Role="Employee" Multiplicity="0..1" />
-          <End Type="TaskLogSystemModel.Task" Role="Task" Multiplicity="*" />
+        <Association Name="FK__RoleAcces__Acces__7E37BEF6">
+          <End Role="Access" Type="Self.Access" Multiplicity="1" />
+          <End Role="RoleAccess" Type="Self.RoleAccess" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Employee">
+            <Principal Role="Access">
+              <PropertyRef Name="AccessID" />
+            </Principal>
+            <Dependent Role="RoleAccess">
+              <PropertyRef Name="AccessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Employees__Repor__6477ECF3">
+          <End Role="Employees" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="Employees1" Type="Self.Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
               <PropertyRef Name="EmployeeID" />
             </Principal>
-            <Dependent Role="Task">
+            <Dependent Role="Employees1">
+              <PropertyRef Name="ReportingPerson" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Employees__RoleI__6383C8BA">
+          <End Role="Roles" Type="Self.Role" Multiplicity="1" />
+          <End Role="Employees" Type="Self.Employee" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="Employees">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Tasks__Approvedo__6B24EA82">
+          <End Role="Employees" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="Tasks" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="EmployeeID" />
+            </Principal>
+            <Dependent Role="Tasks">
               <PropertyRef Name="ApprovedorRejectedBy" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Tasks__ApproverI__46E78A0C">
-          <End Type="TaskLogSystemModel.Employee" Role="Employee" Multiplicity="0..1" />
-          <End Type="TaskLogSystemModel.Task" Role="Task" Multiplicity="*" />
+        <Association Name="FK__Tasks__ApproverI__6A30C649">
+          <End Role="Employees" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="Tasks" Type="Self.Task" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Employee">
+            <Principal Role="Employees">
               <PropertyRef Name="EmployeeID" />
             </Principal>
-            <Dependent Role="Task">
+            <Dependent Role="Tasks">
               <PropertyRef Name="ApproverID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK__Tasks__EmployeeI__45F365D3">
-          <End Type="TaskLogSystemModel.Employee" Role="Employee" Multiplicity="0..1" />
-          <End Type="TaskLogSystemModel.Task" Role="Task" Multiplicity="*" />
+        <Association Name="FK__Tasks__EmployeeI__693CA210">
+          <End Role="Employees" Type="Self.Employee" Multiplicity="0..1" />
+          <End Role="Tasks" Type="Self.Task" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Employee">
+            <Principal Role="Employees">
               <PropertyRef Name="EmployeeID" />
             </Principal>
-            <Dependent Role="Task">
+            <Dependent Role="Tasks">
               <PropertyRef Name="EmployeeID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK__MenuRoleA__MenuI__01142BA1">
+          <End Role="Menus" Type="Self.Menu" Multiplicity="1" />
+          <End Role="MenuRoleAccess" Type="Self.MenuRoleAccess" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Menus">
+              <PropertyRef Name="MenuID" />
+            </Principal>
+            <Dependent Role="MenuRoleAccess">
+              <PropertyRef Name="MenuID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__MenuRoleA__RoleA__02084FDA">
+          <End Role="RoleAccess" Type="Self.RoleAccess" Multiplicity="1" />
+          <End Role="MenuRoleAccess" Type="Self.MenuRoleAccess" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="RoleAccess">
+              <PropertyRef Name="RoleAccessID" />
+            </Principal>
+            <Dependent Role="MenuRoleAccess">
+              <PropertyRef Name="RoleAccessID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__RoleAcces__RoleI__7D439ABD">
+          <End Role="Roles" Type="Self.Role" Multiplicity="1" />
+          <End Role="RoleAccess" Type="Self.RoleAccess" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Roles">
+              <PropertyRef Name="RoleID" />
+            </Principal>
+            <Dependent Role="RoleAccess">
+              <PropertyRef Name="RoleID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="TaskLogSystemEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Accesses" EntityType="Self.Access" />
+          <EntitySet Name="Employees" EntityType="Self.Employee" />
+          <EntitySet Name="MenuRoleAccesses" EntityType="Self.MenuRoleAccess" />
+          <EntitySet Name="Menus" EntityType="Self.Menu" />
+          <EntitySet Name="RoleAccesses" EntityType="Self.RoleAccess" />
+          <EntitySet Name="Roles" EntityType="Self.Role" />
+          <EntitySet Name="Tasks" EntityType="Self.Task" />
+          <AssociationSet Name="FK__RoleAcces__Acces__7E37BEF6" Association="Self.FK__RoleAcces__Acces__7E37BEF6">
+            <End Role="Access" EntitySet="Accesses" />
+            <End Role="RoleAccess" EntitySet="RoleAccesses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Employees__Repor__6477ECF3" Association="Self.FK__Employees__Repor__6477ECF3">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Employees1" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Employees__RoleI__6383C8BA" Association="Self.FK__Employees__RoleI__6383C8BA">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="Employees" EntitySet="Employees" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Tasks__Approvedo__6B24EA82" Association="Self.FK__Tasks__Approvedo__6B24EA82">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Tasks" EntitySet="Tasks" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Tasks__ApproverI__6A30C649" Association="Self.FK__Tasks__ApproverI__6A30C649">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Tasks" EntitySet="Tasks" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Tasks__EmployeeI__693CA210" Association="Self.FK__Tasks__EmployeeI__693CA210">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Tasks" EntitySet="Tasks" />
+          </AssociationSet>
+          <AssociationSet Name="FK__MenuRoleA__MenuI__01142BA1" Association="Self.FK__MenuRoleA__MenuI__01142BA1">
+            <End Role="Menus" EntitySet="Menus" />
+            <End Role="MenuRoleAccess" EntitySet="MenuRoleAccesses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__MenuRoleA__RoleA__02084FDA" Association="Self.FK__MenuRoleA__RoleA__02084FDA">
+            <End Role="RoleAccess" EntitySet="RoleAccesses" />
+            <End Role="MenuRoleAccess" EntitySet="MenuRoleAccesses" />
+          </AssociationSet>
+          <AssociationSet Name="FK__RoleAcces__RoleI__7D439ABD" Association="Self.FK__RoleAcces__RoleI__7D439ABD">
+            <End Role="Roles" EntitySet="Roles" />
+            <End Role="RoleAccess" EntitySet="RoleAccesses" />
+          </AssociationSet>
+          <FunctionImport Name="GetAccessibleMenus" ReturnType="Collection(TaskLogSystemModel.GetAccessibleMenus_Result)">
+          <Parameter Name="EmployeeID" Mode="In" Type="Int32" />
+          </FunctionImport>
+          <FunctionImport Name="GetUserPermissionsForMenu" ReturnType="Collection(String)">
+            <Parameter Name="EmployeeID" Mode="In" Type="Int32" />
+            <Parameter Name="MenuName" Mode="In" Type="String" />
+          </FunctionImport>
+        </EntityContainer>
+        <ComplexType Name="GetAccessibleMenus_Result">
+          <Property Type="Int32" Name="MenuID" Nullable="false" />
+          <Property Type="String" Name="MenuName" Nullable="false" MaxLength="50" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="TaskLogSystemModelStoreContainer" CdmEntityContainer="TaskLogSystemEntities">
-          <EntitySetMapping Name="Departments">
-            <EntityTypeMapping TypeName="TaskLogSystemModel.Department">
-              <MappingFragment StoreEntitySet="Department">
-                <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
-                <ScalarProperty Name="DepartmentName" ColumnName="DepartmentName" />
+          <EntitySetMapping Name="Accesses">
+            <EntityTypeMapping TypeName="TaskLogSystemModel.Access">
+              <MappingFragment StoreEntitySet="Access">
+                <ScalarProperty Name="AccessID" ColumnName="AccessID" />
+                <ScalarProperty Name="AccessName" ColumnName="AccessName" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
           <EntitySetMapping Name="Employees">
             <EntityTypeMapping TypeName="TaskLogSystemModel.Employee">
-              <MappingFragment StoreEntitySet="Employee">
+              <MappingFragment StoreEntitySet="Employees">
                 <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
                 <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
                 <ScalarProperty Name="EmployeeCode" ColumnName="EmployeeCode" />
@@ -298,8 +520,42 @@
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
                 <ScalarProperty Name="MobileNumber" ColumnName="MobileNumber" />
-                <ScalarProperty Name="DepartmentID" ColumnName="DepartmentID" />
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
                 <ScalarProperty Name="ReportingPerson" ColumnName="ReportingPerson" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="MenuRoleAccesses">
+            <EntityTypeMapping TypeName="TaskLogSystemModel.MenuRoleAccess">
+              <MappingFragment StoreEntitySet="MenuRoleAccess">
+                <ScalarProperty Name="MenuRoleAccessID" ColumnName="MenuRoleAccessID" />
+                <ScalarProperty Name="MenuID" ColumnName="MenuID" />
+                <ScalarProperty Name="RoleAccessID" ColumnName="RoleAccessID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Menus">
+            <EntityTypeMapping TypeName="TaskLogSystemModel.Menu">
+              <MappingFragment StoreEntitySet="Menus">
+                <ScalarProperty Name="MenuID" ColumnName="MenuID" />
+                <ScalarProperty Name="MenuName" ColumnName="MenuName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RoleAccesses">
+            <EntityTypeMapping TypeName="TaskLogSystemModel.RoleAccess">
+              <MappingFragment StoreEntitySet="RoleAccess">
+                <ScalarProperty Name="RoleAccessID" ColumnName="RoleAccessID" />
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="AccessID" ColumnName="AccessID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Roles">
+            <EntityTypeMapping TypeName="TaskLogSystemModel.Role">
+              <MappingFragment StoreEntitySet="Roles">
+                <ScalarProperty Name="RoleID" ColumnName="RoleID" />
+                <ScalarProperty Name="RoleName" ColumnName="RoleName" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -307,20 +563,29 @@
             <EntityTypeMapping TypeName="TaskLogSystemModel.Task">
               <MappingFragment StoreEntitySet="Tasks">
                 <ScalarProperty Name="IsDeleted" ColumnName="IsDeleted" />
-                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
-                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
-                <ScalarProperty Name="Status" ColumnName="Status" />
-                <ScalarProperty Name="ApprovedorRejectedOn" ColumnName="ApprovedorRejectedOn" />
-                <ScalarProperty Name="ApprovedorRejectedBy" ColumnName="ApprovedorRejectedBy" />
-                <ScalarProperty Name="ApproverID" ColumnName="ApproverID" />
-                <ScalarProperty Name="TaskDate" ColumnName="TaskDate" />
-                <ScalarProperty Name="TaskDescription" ColumnName="TaskDescription" />
-                <ScalarProperty Name="TaskName" ColumnName="TaskName" />
-                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
                 <ScalarProperty Name="TaskID" ColumnName="TaskID" />
+                <ScalarProperty Name="EmployeeID" ColumnName="EmployeeID" />
+                <ScalarProperty Name="TaskName" ColumnName="TaskName" />
+                <ScalarProperty Name="TaskDescription" ColumnName="TaskDescription" />
+                <ScalarProperty Name="TaskDate" ColumnName="TaskDate" />
+                <ScalarProperty Name="ApproverID" ColumnName="ApproverID" />
+                <ScalarProperty Name="ApprovedorRejectedBy" ColumnName="ApprovedorRejectedBy" />
+                <ScalarProperty Name="ApprovedorRejectedOn" ColumnName="ApprovedorRejectedOn" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="CreatedOn" ColumnName="CreatedOn" />
+                <ScalarProperty Name="ModifiedOn" ColumnName="ModifiedOn" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="GetAccessibleMenus" FunctionName="TaskLogSystemModel.Store.GetAccessibleMenus">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="TaskLogSystemModel.GetAccessibleMenus_Result">
+                <ScalarProperty Name="MenuID" ColumnName="MenuID" />
+                <ScalarProperty Name="MenuName" ColumnName="MenuName" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="GetUserPermissionsForMenu" FunctionName="TaskLogSystemModel.Store.GetUserPermissionsForMenu" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

@@ -20,7 +20,7 @@ namespace TaskLogSystem.CustomFilters
 
             foreach (var allowedRoleId in _allowedRoleIds)
             {
-                if (user.DepartmentID == allowedRoleId)
+                if (user.RoleID == allowedRoleId)
                 {
                     return; // User has one of the allowed roles, so allow access
                 }

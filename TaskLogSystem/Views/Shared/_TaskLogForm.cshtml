@@ -16,7 +16,7 @@
         <div class="col-6 mb-2">
             <div class="form-group">
                 <label class="form-label text-bold" for="TaskName">Task Name</label>
-                @Html.TextBox("TaskName", Model.TaskName, new { @class = "form-control mw-100", id = "TaskName", required = "required" })
+                @Html.TextBox("TaskName", Model.TaskName, new { @class = "form-control mw-100", id = "TaskName"})
                 @Html.ValidationMessageFor(model => model.TaskName, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -27,7 +27,8 @@
                 @{
                     string taskDateValue = Model.TaskDate.HasValue ? Model.TaskDate.Value.ToString("yyyy-MM-dd") : string.Empty;
                 }
-                <input type="date" name="TaskDate" id="TaskDate" class="form-control" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@taskDateValue" required />
+                <input type="date" name="TaskDate" id="TaskDate" class="form-control" max="@DateTime.Now.ToString("yyyy-MM-dd")" value="@taskDateValue" />
+                @Html.ValidationMessageFor(model => model.TaskDate, "", new { @class = "text-danger" })
             </div>
         </div>
 
@@ -35,7 +36,8 @@
         <div class="col-12 mb-3">
             <div class="form-group">
                 <label class="form-label text-bold" for="TaskDescription">Task Description</label>
-                @Html.TextArea("TaskDescription", Model.TaskDescription, new { @class = "form-control mw-100", id = "TaskDescription", required = "required" })
+                @Html.TextArea("TaskDescription", Model.TaskDescription, new { @class = "form-control mw-100", id = "TaskDescription"})
+                @Html.ValidationMessageFor(model => model.TaskDescription, "", new { @class = "text-danger" })
             </div>
         </div>
 

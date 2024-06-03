@@ -13,10 +13,20 @@ namespace TaskLogSystem.Models
         {
             [Key]
             public int TaskID { get; set; }
+
+            [Required(ErrorMessage = "Task Name is required")]
+            [Display(Name = "Task Name")]
+            [RegularExpression(@"^[a-zA-Z ]{2,50}$", ErrorMessage = "Task Name must contain only with Alphabets upto 50 characters")]
             public string TaskName { get; set; }
+
+            [Required(ErrorMessage = "Task Description is required")]
+            [Display(Name = "Task Description")]
+            [StringLength(1000, ErrorMessage = "Task description cannot exceed 1000 characters.")]
             public string TaskDescription { get; set; }
 
+            [Required(ErrorMessage = "Task Date is required")]
             [DisplayFormat(DataFormatString = "{0:d MMM yyyy}")]
+            [Display(Name = "Task Date")]
             public DateTime TaskDate { get; set; }
             public int ApproverID { get; set; }
             public int ApprovedorRejectedBy { get; set; }

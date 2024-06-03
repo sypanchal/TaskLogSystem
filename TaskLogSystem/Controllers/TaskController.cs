@@ -61,13 +61,6 @@ namespace TaskLogSystem.Controllers
         {
             Employee Emp = Session["CurrentUser"] as Employee;
 
-            //Validate TaskName using regex
-            string namePattern = @"^[a-zA-Z ]{2,50}$";
-            if (!Regex.IsMatch(Task.TaskName, namePattern))
-            {
-                ModelState.AddModelError("TaskName", "Enter Task Name only with Alphabets upto 50 characters");
-            }
-
             if (ModelState.IsValid)
             {
                 // Save the task to the database
@@ -80,7 +73,7 @@ namespace TaskLogSystem.Controllers
 
                     if (Task.TaskID == 0)
                     {
-                        // Create a new task object
+                        // Create New Task, when TaskID = 0
                         taskObj.EmployeeID = Emp.EmployeeID;
                         taskObj.TaskName = Task.TaskName;
                         taskObj.TaskDate = taskdate.Date;
@@ -89,10 +82,10 @@ namespace TaskLogSystem.Controllers
                         taskObj.Status = "Pending";
                         taskObj.CreatedOn = DateTime.Now;
                         taskObj.ModifiedOn = DateTime.Now;
-
                     }
                     else
                     {
+                        // Update Task, when TaskID != 0
                         taskObj = _dbContext.Tasks.Find(Task.TaskID);
 
                         taskObj.TaskName = Task.TaskName;
@@ -105,11 +98,8 @@ namespace TaskLogSystem.Controllers
                     _dbContext.Tasks.AddOrUpdate(taskObj);
                     _dbContext.SaveChanges();
 
-                    return Json(new
-                    {
-                        success = true,
-                        redirectUrl = Url.Action("Index", "Home")
-                    });
+                    // Success
+                    return Json(new { success = true });
                 }
                 catch (Exception ex)
                 {
@@ -118,7 +108,7 @@ namespace TaskLogSystem.Controllers
                 }
             }
 
-            // If we got this far, something failed, redisplay form with Errors
+            // If we got this far, something failed, redisplay TaskLogForm with Errors
             return PartialView("_TaskLogForm", Task);
         }
 

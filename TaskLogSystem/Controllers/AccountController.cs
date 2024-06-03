@@ -99,7 +99,7 @@ namespace TaskLogSystem.Controllers
                         Email = email,
                         Password = hashedPassword,
                         MobileNumber = mobile_number,
-                        DepartmentID = 3,
+                        RoleID = 3,
                         ReportingPerson = 101
                     };
 

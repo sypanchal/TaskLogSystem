@@ -71,7 +71,7 @@
                 <div class="form-group">
                     <label class="form-label text-bold" for="DepartmentID">Department</label>
 
-                    @Html.TextBox("DepartmentID", Model.DepartmentID == 1 ? "Director" : Model.DepartmentID == 2 ? "Manager" : "Employee", new { @class = "form-control mw-100", id = "DepartmentID", required = "required", @readonly = "readonly", @disabled = "disabled", style = "cursor: no-drop;" })
+                    @Html.TextBox("DepartmentID", Model.RoleID == 1 ? "Director" : Model.RoleID == 2 ? "Manager" : "Employee", new { @class = "form-control mw-100", id = "DepartmentID", required = "required", @readonly = "readonly", @disabled = "disabled", style = "cursor: no-drop;" })
                 </div>
             </div>
 
